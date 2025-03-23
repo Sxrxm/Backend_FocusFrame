@@ -70,6 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		DecodedJWT decodedJWT = jwtTokenManager.getDecodedJWT(authToken);
+
 		List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
 
 

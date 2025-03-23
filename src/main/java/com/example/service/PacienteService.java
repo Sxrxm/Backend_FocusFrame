@@ -51,6 +51,18 @@ public class PacienteService {
         }
     }
 
+    public String eliminarPaciente(Long pacienteId) {
+        Paciente paciente = pacienteRepository.findById(pacienteId)
+                .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado"));
+
+        pacienteRepository.delete(paciente);
+        User usuario = paciente.getUser();
+        if (usuario != null) {
+            userRepository.delete(usuario);
+        }
+        return "Paciente u usuario eliminados";
+    }
+
     public List<Sesion> obtenerSesionesDePaciente(Long pacienteId) {
         Paciente paciente = pacienteRepository.findById(pacienteId)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));

@@ -26,15 +26,10 @@ public class JwtTokenManager {
 	@Value("${jwt.issuer}")
 	private String issuer;
 
-	public JwtTokenManager() {
-	}
-
 	public String generateToken(User user) {
 		String email = user.getEmail();
 
-		List<String> roles = Arrays.stream(UserRole.values())
-				.map(UserRole::name)
-				.collect(Collectors.toList());
+		List<String> roles = Arrays.asList(user.getUserRole().name());
 
 		return JWT.create()
 				.withSubject(email)

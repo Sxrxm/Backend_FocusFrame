@@ -40,7 +40,7 @@ public class FuncionarioController {
     }
 
     @PostMapping("/paso1")
-    ResponseEntity<RegistrationResponse> registrarUsuario(@RequestBody RegistrationRequest registrationRequest) {
+    ResponseEntity<RegistrationResponse> registroUsuario(@RequestBody RegistrationRequest registrationRequest) {
         try {
             RegistrationResponse response = userService.registration(registrationRequest);
             return ResponseEntity.ok(response);

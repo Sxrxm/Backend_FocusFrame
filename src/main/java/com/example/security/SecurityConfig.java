@@ -52,11 +52,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .cors(cors -> cors.configure(http))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso1").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso2/**").permitAll()
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/paciente/registrar").hasAuthority("PSICOLOGO")
-                        .requestMatchers( HttpMethod.POST,"/paciente/**").permitAll()
+                        .requestMatchers( "/paciente/**").hasAuthority("PSICOLOGO")
                         .anyRequest().authenticated()
                 );
 

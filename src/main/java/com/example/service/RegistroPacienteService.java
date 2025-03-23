@@ -38,6 +38,7 @@ public class RegistroPacienteService {
         }
 
 
+
         User usuario = new User();
         usuario.setUserRole(UserRole.PACIENTE);
         usuario.setEmail(registroPacienteRequest.getEmail());
@@ -55,7 +56,6 @@ public class RegistroPacienteService {
         paciente.setUser(usuario);
         paciente.setEstado(false);
         paciente.setPerfilCompletado(false);
-        paciente.setUserRole(UserRole.PACIENTE);
         paciente = pacienteRepository.save(paciente);
 
         String token = jwtTokenManager.generateToken(usuario);

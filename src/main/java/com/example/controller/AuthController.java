@@ -9,6 +9,7 @@ import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
 import com.example.security.service.AuthenticationService;
 import com.example.security.service.UserService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

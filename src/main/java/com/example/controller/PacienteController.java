@@ -113,6 +113,17 @@ public class PacienteController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id) {
+        try {
+            String mensaje = pacienteService.eliminarPaciente(id);
+            return ResponseEntity.ok(mensaje);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+
     @GetMapping("/pacientes")
     public List<Paciente> getAllPacientes() {
         return pacienteService.getAllPacientes();
@@ -121,8 +132,13 @@ public class PacienteController {
     @PutMapping("/actualizarPaciente")
     public ResponseEntity<Paciente> actualizarPaciente(@PathVariable Long id,@RequestBody Paciente paciente) {
         try {
-            Paciente pacienteActualizado = pacienteService.actualizarPaciente(id, paciente);
-            return ResponseEntity.ok(pacienteActualizado);
+            Paciente pacienteExistente = pacienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
+
+            pacienteExistente.setNombre(paciente.getNombre());
+            pacienteExistente.setTelefono(paciente.getTelefono());
+
+            return ResponseEntity.ok(pacienteExistente);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
