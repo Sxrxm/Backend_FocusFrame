@@ -55,7 +55,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso1").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso2/**").permitAll()
-                        .requestMatchers( "/paciente/**").hasAuthority("PSICOLOGO")
+                        .requestMatchers(HttpMethod.POST,"/funcionario/paso3/**").permitAll()
+                        .requestMatchers( "/paciente/**").permitAll()
+                        .requestMatchers("/sesion/createSesion").hasAuthority("PSICOLOGO")
+                        .requestMatchers("/sesion/createSesion").hasRole("PACIENTE")
                         .anyRequest().authenticated()
                 );
 

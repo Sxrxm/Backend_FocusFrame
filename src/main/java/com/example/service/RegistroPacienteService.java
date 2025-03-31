@@ -23,8 +23,6 @@ public class RegistroPacienteService {
     private EmailService emailService;
 
 
-    @Autowired
-    private JwtTokenManager jwtTokenManager;
 
     public Paciente registrarPaciente(RegistroPacienteRequest registroPacienteRequest) {
 
@@ -58,22 +56,9 @@ public class RegistroPacienteService {
         paciente.setPerfilCompletado(false);
         paciente = pacienteRepository.save(paciente);
 
-        String token = jwtTokenManager.generateToken(usuario);
         String enlace = "http://localhost:3000/register/" + paciente.getIdPaciente();
         emailService.enviarCorreoConEnlace(paciente.getEmail(), enlace, usuario );
 
         return paciente;
-    }
-
-    public Paciente verificarToken (Long pacienteId, String token){
-        String email = jwtTokenManager.getEmailFromToken(token);
-        User usuario = userRepository.findByEmail(email);
-
-        if (usuario != null ){
-            Paciente paciente = pacienteRepository.findByEmail(usuario.getEmail());
-            if (paciente != null && paciente.getIdPaciente().equals(pacienteId))
-            return paciente;
-        }
-        return null;
     }
 }

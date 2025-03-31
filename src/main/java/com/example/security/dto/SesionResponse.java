@@ -9,6 +9,8 @@ import java.time.LocalTime;
 public class SesionResponse {
     private Long id;
     private String nombre;
+    private String nombreP;
+    private String nombreF;
     private Long idFuncionario;
     private Long idPaciente;
     private LocalDate fechaSesion;
@@ -17,9 +19,11 @@ public class SesionResponse {
     private Sesion.MetodoPago metodoPago;
     private Sesion.EstadoSesion estado;
 
-    public SesionResponse(Long id, String nombre, Long idFuncionario, Long idPaciente, LocalDate fechaSesion, LocalTime hora, BigDecimal monto, Sesion.MetodoPago metodoPago, Sesion.EstadoSesion estado) {
+    public SesionResponse(Long id, String nombre, String nombreP, String nombreF, Long idFuncionario, Long idPaciente, LocalDate fechaSesion, LocalTime hora, BigDecimal monto, Sesion.MetodoPago metodoPago, Sesion.EstadoSesion estado) {
         this.id = id;
         this.nombre = nombre;
+        this.nombreP = nombreP;
+        this.nombreF = nombreF;
         this.idFuncionario = idFuncionario;
         this.idPaciente = idPaciente;
         this.fechaSesion = fechaSesion;
@@ -27,6 +31,22 @@ public class SesionResponse {
         this.monto = monto;
         this.metodoPago = metodoPago;
         this.estado = estado;
+    }
+
+    public String getNombreP() {
+        return nombreP;
+    }
+
+    public void setNombreP(String nombreP) {
+        this.nombreP = nombreP;
+    }
+
+    public String getNombreF() {
+        return nombreF;
+    }
+
+    public void setNombreF(String nombreF) {
+        this.nombreF = nombreF;
     }
 
     public Long getId() {

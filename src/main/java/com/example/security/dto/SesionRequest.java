@@ -13,10 +13,28 @@ public class SesionRequest {
     private String nombre;
     private Long idFuncionario;
     private Long idPaciente;
+    private String usernameF;
+    private String usernameP;
     private LocalDate fechaSesion;
     private LocalTime hora;
     private BigDecimal monto;
     private Sesion.MetodoPago metodoPago;
+
+    public String getUsernameF() {
+        return usernameF;
+    }
+
+    public void setUsernameF(String usernameF) {
+        this.usernameF = usernameF;
+    }
+
+    public String getUsernameP() {
+        return usernameP;
+    }
+
+    public void setUsernameP(String usernameP) {
+        this.usernameP = usernameP;
+    }
 
     public String getNombre() {
         return nombre;

@@ -23,6 +23,11 @@ public class Funcionario {
     @Column(nullable = false, name = "id_funcionario")
     private Long idFuncionario;
 
+    @Column( name = "nombres")
+    private String nombre;
+
+    @Column( name = "apellidos")
+    private String apellido;
 
     @Column(nullable = false, name = "especialidad")
     private String especialidad;
@@ -45,6 +50,23 @@ public class Funcionario {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
     @JsonIgnore
     private List<Sesion> sesions;
+
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellidos) {
+        this.apellido = apellidos;
+    }
 
     public Long getIdFuncionario() {
         return idFuncionario;

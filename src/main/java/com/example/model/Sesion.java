@@ -52,6 +52,7 @@ public class Sesion {
     @Column(name = "estado", nullable = false)
     private EstadoSesion estado;
 
+
     public enum MetodoPago {
         EFECTIVO, TARJETA, TRANSFERENCIA
     }

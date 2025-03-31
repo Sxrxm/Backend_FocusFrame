@@ -6,16 +6,15 @@ import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.FuncionarioRepository;
 import com.example.repository.UserRepository;
-import com.example.security.service.UserServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.security.dto.FuncionarioPaso1Request;
+import com.example.security.dto.RegistrationRequest;
+import com.example.security.dto.RegistrationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -27,6 +26,9 @@ public class FuncionarioService {
     @Autowired
     private FuncionarioRepository funcionarioRepository;
 
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -46,22 +48,62 @@ public class FuncionarioService {
         return funcionarioRepository.findAll();
     }
 
+    public Funcionario paso1(FuncionarioPaso1Request request) {
 
-    public User paso1(User user, Locale locale) {
+        User usuario = new User();
+        usuario.setUserRole(UserRole.PSICOLOGO);
+        usuario.setEmail(null);
+        usuario.setPassword(null);
+        usuario.setUsername(null);
+        usuario = userRepository.save(usuario);
 
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+
+        Funcionario funcionario = new Funcionario();
+        funcionario.setNombre(request.getNombre());
+        funcionario.setApellido(request.getApellido());
+        funcionario.setEspecialidad("null");
+        funcionario.setExperiencia("null");
+        funcionario.setLicencia("null");
+        funcionario.setEstado(false);
+        funcionario.setUser(usuario);
+        return funcionarioRepository.save(funcionario);
+
+    }
+
+    public RegistrationResponse paso2(Long idFuncionario, RegistrationRequest registrationRequest) {
+
+        if (userRepository.findByEmail(registrationRequest.getEmail()) != null) {
             throw new IllegalArgumentException("El correo electrónico ya está registrado");
         }
 
-        return userRepository.save(user);
+        Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+
+        User usuario = new User();
+        usuario.setUserRole(UserRole.PSICOLOGO);
+        usuario.setEmail(registrationRequest.getEmail());
+        usuario.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+        usuario.setUsername(registrationRequest.getUsername());
+
+        userRepository.save(usuario);
+
+        funcionario.setUser(usuario);
+        funcionario.setEstado(true);
+        funcionarioRepository.save(funcionario);
+
+        return new RegistrationResponse("Usuario registrado exitosamente");
     }
 
-    public Funcionario paso2(Long idUsuario, Funcionario funcionario) {
+    public Funcionario paso3(Long idUsuario, Funcionario funcionario) {
 
         Optional<User> usuario = userRepository.findById(idUsuario);
 
         if (usuario.isPresent()) {
             funcionario.setUser(usuario.get());
+            funcionario.setLicencia(funcionario.getLicencia());
+            funcionario.setExperiencia(funcionario.getExperiencia());
+            funcionario.setEspecialidad(funcionario.getEspecialidad());
             return funcionarioRepository.save(funcionario);
         }else {
             throw new RuntimeException("Usuario no encontrado.");

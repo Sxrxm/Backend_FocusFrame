@@ -37,9 +37,11 @@ public class SesionController {
 
     @PostMapping("/createSesion")
     public ResponseEntity<SesionResponse> registrarSesion(@RequestBody SesionRequest sesionRequest) {
+        if (sesionRequest.getIdFuncionario() == null || sesionRequest.getIdPaciente() == null) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("paciente o funcionario no pueden ser nulos");
+        }
         try {
             SesionResponse sesionResponse = sesionService.registrarSesion(sesionRequest);
-
             return new ResponseEntity<>(sesionResponse, HttpStatus.CREATED);
         }catch (Exception e) {
 
