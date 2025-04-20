@@ -1,4 +1,4 @@
-package com.example.security.service;
+package com.example.service;
 
 import com.example.model.Paciente;
 import com.example.model.User;
@@ -6,6 +6,7 @@ import com.example.repository.PacienteRepository;
 import com.example.security.dto.CompletarPerfilPacienteRequest;
 import com.example.security.dto.PacienteResponse;
 import com.example.security.jwt.JwtTokenManager;
+import com.example.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

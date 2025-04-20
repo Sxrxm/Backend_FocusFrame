@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.Date;
 
 @Getter
@@ -37,9 +41,45 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
 
+
+    @Column(name = "tokenReset")
+    private String resetToken;
+
+    @Column(name = "expiraciónToken")
+    private LocalDateTime tokenExpiry;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false)
     private UserRole userRole;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipoDoc")
+    private TipoDoc tipoDoc;
+
+    private LocalDate fechaNacimiento;
+
+    @Transient
+    public boolean menorEdad() {
+        if (fechaNacimiento == null) return false;
+        return Period.between(fechaNacimiento, LocalDate.now()).getYears() < 18;
+    }
+
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public TipoDoc getTipoDoc() {
+        return tipoDoc;
+    }
+
+    public void setTipoDoc(TipoDoc tipoDoc) {
+        this.tipoDoc = tipoDoc;
+    }
 
 
     @PrePersist
@@ -55,7 +95,21 @@ public class User {
         this.id = id;
     }
 
+    public String getResetToken() {
+        return resetToken;
+    }
 
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getTokenExpiry() {
+        return tokenExpiry;
+    }
+
+    public void setTokenExpiry(LocalDateTime tokenExpiry) {
+        this.tokenExpiry = tokenExpiry;
+    }
 
     public String getUsername() {
         return username;

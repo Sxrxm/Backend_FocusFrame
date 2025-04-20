@@ -1,15 +1,23 @@
 package com.example.service;
 
+import com.auth0.jwt.JWT;
+import com.example.model.User;
 import com.example.repository.UserRepository;
 import com.example.security.dto.RegistrationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class UserValidationService {
+
+	@Value("${jwt.secretKey}")
+	private String secretKey;
 
 	@Autowired
 	private UserRepository userRepository;

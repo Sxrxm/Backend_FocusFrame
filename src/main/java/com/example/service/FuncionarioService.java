@@ -2,6 +2,7 @@ package com.example.service;
 
 
 import com.example.model.Funcionario;
+import com.example.model.Paciente;
 import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.FuncionarioRepository;
@@ -9,12 +10,14 @@ import com.example.repository.UserRepository;
 import com.example.security.dto.FuncionarioPaso1Request;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
+import com.example.security.utils.ValidarEdad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -70,14 +73,23 @@ public class FuncionarioService {
 
     }
 
-    public RegistrationResponse paso2(Long idFuncionario, RegistrationRequest registrationRequest) {
+    public RegistrationResponse paso2(Long idFuncionario, RegistrationRequest registrationRequest, Locale locale) {
+
+        String mensaje = messageSource.getMessage("user.not.found", null, locale);
 
         if (userRepository.findByEmail(registrationRequest.getEmail()) != null) {
-            throw new IllegalArgumentException("El correo electrónico ya está registrado");
+            throw new IllegalArgumentException(messageSource.getMessage("email.not.found", null, locale));
         }
 
+        if (userRepository.findByUsername(registrationRequest.getUsername()) != null) {
+            throw new IllegalArgumentException(messageSource.getMessage("username.found",null,locale));
+        }
+
+        ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "PSICOLOGO");
+
         Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException(mensaje));
+
 
 
         User usuario = new User();
@@ -89,24 +101,38 @@ public class FuncionarioService {
         userRepository.save(usuario);
 
         funcionario.setUser(usuario);
-        funcionario.setEstado(true);
         funcionarioRepository.save(funcionario);
 
         return new RegistrationResponse("Usuario registrado exitosamente");
     }
 
-    public Funcionario paso3(Long idUsuario, Funcionario funcionario) {
+    public Funcionario paso3(Long idUsuario, Funcionario funcionario, Locale locale) {
 
         Optional<User> usuario = userRepository.findById(idUsuario);
 
+        String mensaje = messageSource.getMessage("user.not.found", null, locale);
         if (usuario.isPresent()) {
             funcionario.setUser(usuario.get());
             funcionario.setLicencia(funcionario.getLicencia());
             funcionario.setExperiencia(funcionario.getExperiencia());
             funcionario.setEspecialidad(funcionario.getEspecialidad());
+            funcionario.setEstado(true);
             return funcionarioRepository.save(funcionario);
         }else {
-            throw new RuntimeException("Usuario no encontrado.");
+            throw new RuntimeException(mensaje);
         }
+    }
+
+
+    public String eliminarFuncionario(Long funcionadioId) {
+        Funcionario funcionario = funcionarioRepository.findById(funcionadioId)
+                .orElseThrow(() -> new IllegalArgumentException("funcionario no encontrado"));
+
+        funcionarioRepository.delete(funcionario);
+        User usuario = funcionario.getUser();
+        if (usuario != null) {
+            userRepository.delete(usuario);
+        }
+        return "Funcionario y usuario eliminados";
     }
 }

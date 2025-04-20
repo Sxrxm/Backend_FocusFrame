@@ -1,15 +1,36 @@
 package com.example.security.dto;
 
+import com.example.model.TipoDoc;
+
 import java.time.LocalDate;
 
 public class PacienteResponse {
     private Long idPaciente;
     private Long telefono;
     private LocalDate fechaNacimiento;
+    private TipoDoc tipoDoc;
     private Integer documento;
     private Boolean estado;
     private String email;
     private String username;
+    private int edad;
+    private boolean menorEdad;
+
+    public TipoDoc getTipoDoc() {
+        return tipoDoc;
+    }
+
+    public void setTipoDoc(TipoDoc tipoDoc) {
+        this.tipoDoc = tipoDoc;
+    }
+
+    public int getEdad() { return edad; }
+
+    public void setEdad(int edad) { this.edad = edad; }
+
+    public boolean isMenorEdad() { return menorEdad; }
+
+    public void setMenorEdad(boolean menorEdad) { this.menorEdad = menorEdad;}
 
     public String getEmail() {
         return email;

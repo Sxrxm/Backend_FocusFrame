@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -51,10 +52,10 @@ public class FuncionarioController {
     }
 
     @PostMapping("/paso2/{idFuncionario}")
-    ResponseEntity<RegistrationResponse> registroUsuario(@RequestBody RegistrationRequest registrationRequest, @PathVariable Long idFuncionario) {
+    ResponseEntity<RegistrationResponse> registroUsuario(@RequestBody RegistrationRequest registrationRequest, @PathVariable Long idFuncionario, Locale locale) {
 
         try {
-            RegistrationResponse response = funcionarioService.paso2(idFuncionario, registrationRequest);
+            RegistrationResponse response = funcionarioService.paso2(idFuncionario, registrationRequest, locale);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new RegistrationResponse(e.getMessage()));
@@ -64,8 +65,20 @@ public class FuncionarioController {
 
 
     @PostMapping("/paso3/{idUsuario}")
-    public ResponseEntity<Funcionario> registroFuncionario(@PathVariable Long idUsuario, @RequestBody Funcionario funcionario) {
-        Funcionario paso3 = funcionarioService.paso3(idUsuario, funcionario);
+    public ResponseEntity<Funcionario> registroFuncionario(@PathVariable Long idUsuario, @RequestBody Funcionario funcionario, Locale locale) {
+        Funcionario paso3 = funcionarioService.paso3(idUsuario, funcionario, locale);
         return new ResponseEntity<>(paso3, HttpStatus.CREATED);
+    }
+
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id) {
+        try {
+            String mensaje = funcionarioService.eliminarFuncionario(id);
+            return ResponseEntity.ok(mensaje);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 }

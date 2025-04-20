@@ -53,6 +53,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/auth/recuperarContra").permitAll()
+                        .requestMatchers("/auth/recuperar-contrasena").permitAll()
+                        .requestMatchers("/auth/validate-reset-token").permitAll()
+                        .requestMatchers(HttpMethod.POST, "auth/cambioContra").authenticated()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso1").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso2/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso3/**").permitAll()
@@ -70,7 +74,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("http://localhost:5173")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type", "Authorization")
                 .allowCredentials(true);

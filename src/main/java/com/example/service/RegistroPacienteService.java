@@ -8,7 +8,10 @@ import com.example.repository.UserRepository;
 import com.example.security.dto.RegistroPacienteRequest;
 import com.example.security.jwt.JwtTokenManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+
+import java.util.Locale;
 
 @Service
 public class RegistroPacienteService {
@@ -22,17 +25,20 @@ public class RegistroPacienteService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    MessageSource messageSource;
 
 
-    public Paciente registrarPaciente(RegistroPacienteRequest registroPacienteRequest) {
+
+    public Paciente registrarPaciente(RegistroPacienteRequest registroPacienteRequest, Locale locale) {
 
         if (userRepository.findByEmail(registroPacienteRequest.getEmail()) != null) {
-            throw new IllegalArgumentException("El correo electrónico ya está registrado");
+            throw new IllegalArgumentException(messageSource.getMessage("email.use", null, locale ));
         }
 
 
         if (pacienteRepository.findByDocumento(registroPacienteRequest.getDocumento()) != null) {
-            throw new IllegalArgumentException("Este número de documento ya está registrado");
+            throw new IllegalArgumentException(messageSource.getMessage("doc.register", null, locale));
         }
 
 
@@ -40,12 +46,14 @@ public class RegistroPacienteService {
         User usuario = new User();
         usuario.setUserRole(UserRole.PACIENTE);
         usuario.setEmail(registroPacienteRequest.getEmail());
+        usuario.setTipoDoc(registroPacienteRequest.getTipoDoc());
         usuario.setPassword(null);
         usuario.setUsername(null);
         usuario = userRepository.save(usuario);
 
         Paciente paciente = new Paciente();
         paciente.setTelefono(registroPacienteRequest.getTelefono());
+        paciente.setTipoDoc(registroPacienteRequest.getTipoDoc());
         paciente.setDocumento(registroPacienteRequest.getDocumento());
         paciente.setFechaNacimiento(registroPacienteRequest.getFechaNacimiento());
         paciente.setEmail(registroPacienteRequest.getEmail());
@@ -56,8 +64,8 @@ public class RegistroPacienteService {
         paciente.setPerfilCompletado(false);
         paciente = pacienteRepository.save(paciente);
 
-        String enlace = "http://localhost:3000/register/" + paciente.getIdPaciente();
-        emailService.enviarCorreoConEnlace(paciente.getEmail(), enlace, usuario );
+        String enlace = "http://localhost:5173/register/" + paciente.getIdPaciente();
+        emailService.enviarCorreoConEnlace(paciente.getEmail(), enlace, usuario, paciente );
 
         return paciente;
     }

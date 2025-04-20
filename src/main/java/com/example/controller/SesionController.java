@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @RequestMapping("/sesion")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 public class SesionController {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);

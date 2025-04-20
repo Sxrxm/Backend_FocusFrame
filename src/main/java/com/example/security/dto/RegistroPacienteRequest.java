@@ -1,6 +1,7 @@
 package com.example.security.dto;
 
 
+import com.example.model.TipoDoc;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,6 +15,9 @@ public class RegistroPacienteRequest {
     @NotNull(message = "La fecha de nacimiento es obligatoria.")
     private LocalDate fechaNacimiento;
 
+    @NotNull(message = "seleccione un tipo de documento")
+    private TipoDoc tipoDoc;
+
     @NotNull(message = "El documento es obligatorio.")
     private Integer documento;
 
@@ -25,6 +29,15 @@ public class RegistroPacienteRequest {
 
     @NotNull(message = "El apellido es obligatorio")
     private String apellido;
+
+
+    public @NotNull(message = "seleccione un tipo de documento") TipoDoc getTipoDoc() {
+        return tipoDoc;
+    }
+
+    public void setTipoDoc(@NotNull(message = "seleccione un tipo de documento") TipoDoc tipoDoc) {
+        this.tipoDoc = tipoDoc;
+    }
 
     public String getApellido() {
         return apellido;

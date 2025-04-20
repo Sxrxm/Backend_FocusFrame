@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
 import java.util.List;
+
 
 @Entity
 @Table(name = "paciente")
@@ -38,6 +40,9 @@ public class Paciente {
     @Column(nullable = false, name = "documento")
     private int documento;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipoDoc")
+    private TipoDoc tipoDoc;
 
     @Column(nullable = false)
     private String email;
@@ -63,6 +68,32 @@ public class Paciente {
     @Column(name = "rol")
     private UserRole userRole;
 
+
+
+    @PrePersist
+    public void asignarFechaCreacion() {
+        this.fechaCreacion = new Date();
+    }
+
+    @Transient
+    public int getEdad(){
+        return Period.between(this.fechaNacimiento, LocalDate.now()).getYears();
+    }
+
+
+    @Transient
+    public boolean menorEdad() {
+        return getEdad() < 18;
+    }
+
+    public TipoDoc getTipoDoc() {
+        return tipoDoc;
+    }
+
+    public void setTipoDoc(TipoDoc tipoDoc) {
+        this.tipoDoc = tipoDoc;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -87,10 +118,7 @@ public class Paciente {
         this.sesions = sesions;
     }
 
-    @PrePersist
-    public void asignarFechaCreacion() {
-        this.fechaCreacion = new Date();
-    }
+
 
 
 

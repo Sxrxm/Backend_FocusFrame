@@ -60,7 +60,7 @@ public class PacienteService {
         if (usuario != null) {
             userRepository.delete(usuario);
         }
-        return "Paciente u usuario eliminados";
+        return "Paciente y usuario eliminados";
     }
 
     public List<Sesion> obtenerSesionesDePaciente(Long pacienteId) {

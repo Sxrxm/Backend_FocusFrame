@@ -1,11 +1,15 @@
 package com.example.service;
 
+import com.example.model.Paciente;
 import com.example.model.User;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import javax.mail.MessagingException;
 
 @Service
 public class EmailService {
@@ -15,27 +19,34 @@ public class EmailService {
 
     private User user;
 
-
-    public void enviarCorreoConEnlace(String email, String enlace, User user) {
+    public void enviarCorreoConEnlace(String email, String enlace, User user, Paciente paciente) {
         if (email == null || email.isEmpty()) {
             System.err.println("Error: El correo electrónico es nulo o vacío.");
             return;
         }
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Completa tu registro");
-        message.setText("Hola, " + user.getEmail() +
-                "\n\nPara completar tu perfil, haz clic en el siguiente enlace:\n" +
-                enlace +
-                "\n\nEste enlace te llevará a una página donde podrás crear tu nombre de usuario y establecer una contraseña." +
-                "\n\nBienvenido a FocusFrame.");
+        MimeMessage message = mailSender.createMimeMessage();
 
         try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(email);
+            helper.setSubject("Completa tu registro");
+
+            String body = "<html><body>" +
+                    "Hola, <span style=\"color: #5603ad;\">" + paciente.getNombre() + " " + paciente.getApellido() + "</span><br><br>" +
+                    "Para completar tu perfil, haz clic en el siguiente enlace:<br>" +
+                    "<a href=\"" + enlace + "\" style=\"color: #5603ad;\">" + enlace + "</a><br><br>" +
+                    "Este enlace te llevará a una página donde podrás crear tu nombre de usuario y establecer una contraseña.<br><br>" +
+                    "Bienvenido a <h2 style=\"color: #5603ad;\"> FocusFrame </h2> <br>" +
+                    "</body></html>";
+
+            helper.setText(body, true);
+
             mailSender.send(message);
             System.out.println("Correo enviado a: " + email);
-        } catch (MailException e) {
-            System.err.println("Error al enviar el correo a " + email + ": " + e.getMessage());
+
+        } catch (MailException | jakarta.mail.MessagingException e) {
+            System.err.println("Error al enviar el correo: " + e.getMessage());
             e.printStackTrace();
         }
     }

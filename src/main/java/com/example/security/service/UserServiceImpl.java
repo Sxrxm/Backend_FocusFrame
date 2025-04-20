@@ -7,6 +7,7 @@ import com.example.security.dto.AuthenticatedUserDto;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
 import com.example.security.mapper.UserMapper;
+import com.example.security.utils.ValidarEdad;
 import com.example.service.UserValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +37,14 @@ public class UserServiceImpl implements UserService {
 
 
 
-	public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserValidationService userValidationService, MessageSource messageSource, UserRepository userRepository1){
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserValidationService userValidationService) {
+        this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userValidationService = userValidationService;
-        this.userRepository = userRepository;
     }
 
-	@Override
+
+    @Override
 	public User findByEmail(String Email) {
 		return userRepository.findByEmail(Email);
 	}
@@ -56,9 +58,19 @@ public class UserServiceImpl implements UserService {
 
 		userValidationService.validateUser(registrationRequest);
 
-		final User user = UserMapper.INSTANCE.convertToUser(registrationRequest);
+        if (registrationRequest.getUserRole() == UserRole.ADMIN) {
+            ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "ADMIN");
+        }
+
+
+
+        final User user = UserMapper.INSTANCE.convertToUser(registrationRequest);
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		user.setUserRole(UserRole.valueOf("USER"));
+        user.setFechaNacimiento(registrationRequest.getFechaNacimiento());
+		user.setUserRole(UserRole.valueOf("ADMIN"));
+
+
+
 		userRepository.save(user);
 
 		final String email = registrationRequest.getEmail();

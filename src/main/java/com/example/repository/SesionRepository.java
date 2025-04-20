@@ -1,8 +1,6 @@
 package com.example.repository;
 
-import com.example.model.Funcionario;
 import com.example.model.Sesion;
-import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
