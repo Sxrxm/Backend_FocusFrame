@@ -63,7 +63,7 @@ public class PacienteController {
             Paciente paciente = registroPacienteService.registrarPaciente(request, locale);
             return new ResponseEntity<>(paciente, HttpStatus.CREATED);
         } catch (IllegalArgumentException ex) {
-            String mensaje = ex.getMessage(); // Ya viene traducido desde el service
+            String mensaje = ex.getMessage();
             Map<String, String> error = Map.of("error", mensaje);
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Locale;
 
 @Service
@@ -59,6 +61,8 @@ public class RegistroPacienteService {
         paciente.setEmail(registroPacienteRequest.getEmail());
         paciente.setNombre(registroPacienteRequest.getNombre());
         paciente.setApellido(registroPacienteRequest.getApellido());
+        paciente.setUserRole(UserRole.PACIENTE);
+        paciente.setFechaCreacion(new Date());
         paciente.setUser(usuario);
         paciente.setEstado(false);
         paciente.setPerfilCompletado(false);

@@ -114,22 +114,6 @@ public class AuthController {
     }
 
 
-    @PostMapping("/recuperar-contrasena")
-    public ResponseEntity<?> restablecerContra(@RequestParam String token, @RequestBody RecuperarContraRequest request, Locale locale) {
-
-        if (!request.getNueva().equals(request.getConfirmar())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Las contraseñas no coinciden.");
-        }
-
-        try {
-            passwordResetService.cambiarPassword(token, request.getNueva());
-            String mensaje = messageSource.getMessage("password.changed.success", null, locale);
-            return ResponseEntity.ok().body(Map.of("mensaje", mensaje));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
-        }
-    }
-
     @PostMapping("/recuperarContra")
     public ResponseEntity<?> forgotPassword(@RequestParam String email,
                                             Locale locale) {
@@ -146,6 +130,23 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/recuperar-contrasena")
+    public ResponseEntity<?> restablecerContra(@RequestParam String token, @RequestBody RecuperarContraRequest request, Locale locale) {
+
+        if (!request.getNueva().equals(request.getConfirmar())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Las contraseñas no coinciden.");
+        }
+
+        try {
+            passwordResetService.cambiarPassword(token, request.getNueva());
+            String mensaje = messageSource.getMessage("password.changed.success", null, locale);
+            return ResponseEntity.ok().body(Map.of("mensaje", mensaje));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
 
     @PostMapping("/cambioContra")
     public ResponseEntity<?> cambiarContra(@RequestBody CambioContraRequest request, Locale locale) {

@@ -28,6 +28,10 @@ public class Sesion {
     @JsonIgnore
     private Paciente paciente;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "historialClinico_id", nullable = false)
+    private HistorialClinico historialClinico;
+
     @Column(nullable = false, length = 100, name = "nombre")
     private String nombre;
 
@@ -66,6 +70,14 @@ public class Sesion {
     public void asignarFechaRegistro() {
 
             this.fechaRegistro = new Date();
+    }
+
+    public HistorialClinico getHistorialClinico() {
+        return historialClinico;
+    }
+
+    public void setHistorialClinico(HistorialClinico historialClinico) {
+        this.historialClinico = historialClinico;
     }
 
     public Long getId() {

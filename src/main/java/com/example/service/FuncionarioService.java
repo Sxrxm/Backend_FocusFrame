@@ -94,6 +94,8 @@ public class FuncionarioService {
 
         User usuario = new User();
         usuario.setUserRole(UserRole.PSICOLOGO);
+        usuario.setFechaNacimiento(registrationRequest.getFechaNacimiento());
+        usuario.setTipoDoc(registrationRequest.getTipoDoc());
         usuario.setEmail(registrationRequest.getEmail());
         usuario.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
         usuario.setUsername(registrationRequest.getUsername());
@@ -106,22 +108,22 @@ public class FuncionarioService {
         return new RegistrationResponse("Usuario registrado exitosamente");
     }
 
-    public Funcionario paso3(Long idUsuario, Funcionario funcionario, Locale locale) {
+    public Funcionario paso3(Long idUsuario, Funcionario datosNuevos, Locale locale) {
 
-        Optional<User> usuario = userRepository.findById(idUsuario);
+        User usuario = userRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException(messageSource.getMessage("user.not.found", null, locale)));
 
-        String mensaje = messageSource.getMessage("user.not.found", null, locale);
-        if (usuario.isPresent()) {
-            funcionario.setUser(usuario.get());
-            funcionario.setLicencia(funcionario.getLicencia());
-            funcionario.setExperiencia(funcionario.getExperiencia());
-            funcionario.setEspecialidad(funcionario.getEspecialidad());
-            funcionario.setEstado(true);
-            return funcionarioRepository.save(funcionario);
-        }else {
-            throw new RuntimeException(mensaje);
-        }
+        Funcionario funcionarioExistente = funcionarioRepository.findByUserId(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Funcionario no encontrado"));
+
+        funcionarioExistente.setLicencia(datosNuevos.getLicencia());
+        funcionarioExistente.setExperiencia(datosNuevos.getExperiencia());
+        funcionarioExistente.setEspecialidad(datosNuevos.getEspecialidad());
+        funcionarioExistente.setEstado(true);
+
+        return funcionarioRepository.save(funcionarioExistente);
     }
+
 
 
     public String eliminarFuncionario(Long funcionadioId) {

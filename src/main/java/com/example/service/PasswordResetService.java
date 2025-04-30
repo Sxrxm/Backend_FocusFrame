@@ -30,8 +30,7 @@ public class PasswordResetService {
     @Autowired
     private MessageSource messageSource;
 
-    @Value("${app.baseUrl}")
-    private String baseUrl;
+
 
     public void recuperarPassword(String email, Locale locale) {
         User user = userRepository.findByEmail(email);
@@ -45,7 +44,7 @@ public class PasswordResetService {
         userRepository.save(user);
 
 
-        String linkCambio = baseUrl + "/recuperar-contrasena?token=" + token;
+        String linkCambio = "http://localhost:5173/auth/recuperar-contrasena?token=" + token;
         String mensaje = messageSource.getMessage(
                 "password.reset.email.text",
                 new Object[]{linkCambio},

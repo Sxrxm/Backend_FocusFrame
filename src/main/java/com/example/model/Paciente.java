@@ -1,6 +1,7 @@
 package com.example.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -60,7 +61,8 @@ public class Paciente {
     @JsonIgnore
     private List<Sesion> sesions;
 
-    @Column(name = "fecha_creacion", updatable = false)
+    @Column(name = "fecha_creacion")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Bogota")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
 
@@ -68,12 +70,11 @@ public class Paciente {
     @Column(name = "rol")
     private UserRole userRole;
 
+    @OneToOne(mappedBy = "paciente", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private HistorialClinico historialClinico;
 
 
-    @PrePersist
-    public void asignarFechaCreacion() {
-        this.fechaCreacion = new Date();
-    }
 
     @Transient
     public int getEdad(){
@@ -84,6 +85,15 @@ public class Paciente {
     @Transient
     public boolean menorEdad() {
         return getEdad() < 18;
+    }
+
+
+    public HistorialClinico getHistorialClinico() {
+        return historialClinico;
+    }
+
+    public void setHistorialClinico(HistorialClinico historialClinico) {
+        this.historialClinico = historialClinico;
     }
 
     public TipoDoc getTipoDoc() {
@@ -117,9 +127,6 @@ public class Paciente {
     public void setSesions(List<Sesion> sesions) {
         this.sesions = sesions;
     }
-
-
-
 
 
     public boolean isPerfilCompletado() {

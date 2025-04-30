@@ -41,14 +41,14 @@ public class FuncionarioController {
     }
 
     @PostMapping("/paso1")
-    ResponseEntity<Long> nombresApellidos(@RequestBody FuncionarioPaso1Request paso1) {
+    ResponseEntity<Funcionario> nombresApellidos(@RequestBody FuncionarioPaso1Request paso1) {
         if (paso1.getNombre() == null || paso1.getApellido() == null || paso1.getNombre().isEmpty() || paso1.getApellido().isEmpty()){
             return ResponseEntity.badRequest().body(null);
         }
 
         Funcionario funcionario = funcionarioService.paso1(paso1);
 
-        return ResponseEntity.ok(funcionario.getIdFuncionario());
+        return ResponseEntity.ok(funcionario);
     }
 
     @PostMapping("/paso2/{idFuncionario}")
