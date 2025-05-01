@@ -17,8 +17,10 @@ public interface HistorialClinicoRepository extends JpaRepository<HistorialClini
     //@Query("SELECT hc FROM historialClinico hc LEFT JOIN FETCH hc.sesion WHERE hc.paciente.id = :pacienteId")
     //Optional<HistorialClinico> findByPacienteIdWithSesion(@Param("pacienteId") Long pacienteId);
 
+
     @Query("SELECT h FROM HistorialClinico h LEFT JOIN FETCH h.sesiones WHERE h.paciente.id = :pacienteId")
     Optional<HistorialClinico> findByPacienteIdWithAllData(@Param("pacienteId") Long pacienteId);
+
 
     boolean existsByPaciente(Paciente paciente);
 }

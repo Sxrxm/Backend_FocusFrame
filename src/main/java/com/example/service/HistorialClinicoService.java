@@ -7,6 +7,7 @@ import com.example.repository.ContactoEmergenciaRepository;
 import com.example.repository.HistorialClinicoRepository;
 import com.example.repository.PacienteRepository;
 import com.example.security.dto.HistorialClinicoDto;
+import com.example.security.dto.HistorialClinicoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -36,12 +37,12 @@ public class HistorialClinicoService {
     }
 
     public HistorialClinico crearHistorial(Long pacienteId, HistorialClinicoDto historialClinicoDto, Locale locale) {
-        Paciente paciente = pacienteRepository.findById(pacienteId).orElseThrow(() -> new IllegalArgumentException(messageSource.getMessage("user.not.found", null, locale)));
+        Paciente paciente = pacienteRepository.findById(pacienteId)
+                .orElseThrow(() -> new IllegalArgumentException(messageSource.getMessage("patient.not.found", null, locale)));
+
 
         if (historialClinicoRepository.existsByPaciente(paciente)) {
-
             throw new IllegalArgumentException(messageSource.getMessage("medical.history.found", null, locale));
-
         }
 
         HistorialClinico historialClinico = new HistorialClinico();
@@ -76,18 +77,17 @@ public class HistorialClinicoService {
 
     }
 
-    public HistorialClinicoDto getHistorialClinico(Long pacienteId, Locale locale) {
+    public HistorialClinicoResponse getHistorialClinico(Long pacienteId, Locale locale) {
         Paciente paciente = pacienteRepository.findById(pacienteId)
                 .orElseThrow(() -> new RuntimeException(messageSource.getMessage("user.not.found", null, locale)));
 
-
-        HistorialClinico historialClinico = historialClinicoRepository.findByPacienteIdWithAllData(pacienteId)
+        HistorialClinico historialClinico = historialClinicoRepository.findByPacienteIdWithAllData(paciente.getIdPaciente())
                 .orElseThrow(() -> new RuntimeException(messageSource.getMessage("medical.history.not.found", null, locale)));
 
         return convertToDto(historialClinico, paciente);
     }
 
-    private HistorialClinicoDto convertToDto(HistorialClinico historialClinico, Paciente paciente) {
+    private HistorialClinicoResponse convertToDto(HistorialClinico historialClinico, Paciente paciente) {
         HistorialClinicoDto dto = new HistorialClinicoDto();
 
         dto.setHobbies(historialClinico.getHobbies());
@@ -96,7 +96,6 @@ public class HistorialClinicoService {
         dto.setOtroMedicamento(historialClinico.getOtroMedicamento());
         dto.setEnfermedades(historialClinico.getEnfermedades());
         dto.setOtraEnfermedad(historialClinico.getOtraEnfermedad());
-
         dto.setOcupacion(historialClinico.getOcupacion());
         dto.setObservacionesGenerales(historialClinico.getObservacionesGenerales());
 
@@ -111,8 +110,11 @@ public class HistorialClinicoService {
             dto.setContactoEmergencia(contactoEmergenciaDto);
         }
 
-        return dto;
+
+        return new HistorialClinicoResponse(dto, paciente);
     }
+
+
     public HistorialClinico actualizarHistorialClinico(Long id, HistorialClinicoDto historialClinicoDto, Locale locale) {
         HistorialClinico historialClinico = historialClinicoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(messageSource.getMessage("medical.history.not.found", null, locale)));

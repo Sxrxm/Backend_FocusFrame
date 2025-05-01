@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -111,12 +110,12 @@ public class HistorialClinico {
 
     public enum Enfermedades {
          Diabetes,
-         Hipertensión,
+         Hipertension,
          Asma,
-         Depresión,
+         Depresion,
          Ansiedad,
          Artritis,
-         Migraña,
+         Migrana,
          Esquizofrenia,
          TDAH,
          Autismo,

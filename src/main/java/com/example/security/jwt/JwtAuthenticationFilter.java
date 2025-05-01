@@ -79,9 +79,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 
-		UsernamePasswordAuthenticationToken authentication =
-				new UsernamePasswordAuthenticationToken(user, null, authorities);
-		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		log.info("Autenticacion exitosa. Ingresaste con: {}", email);

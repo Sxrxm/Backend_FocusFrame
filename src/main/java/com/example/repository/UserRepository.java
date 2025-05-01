@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import com.example.model.User;
+import com.example.model.UserRole;
 import com.example.security.dto.AuthenticatedUserDto;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
@@ -16,5 +17,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     Optional<User> findByResetToken(String resetToken);
 
-    List<User> username(String username);
 }

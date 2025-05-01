@@ -1,5 +1,6 @@
 package com.example.security.dto;
 
+import com.example.model.Paciente;
 import com.example.model.TipoDoc;
 
 import java.time.LocalDate;
@@ -15,6 +16,19 @@ public class PacienteResponse {
     private String username;
     private int edad;
     private boolean menorEdad;
+
+    public PacienteResponse() {
+    }
+
+    public PacienteResponse(Paciente paciente) {
+        this.telefono = paciente.getTelefono();
+        this.fechaNacimiento = paciente.getFechaNacimiento();
+        this.tipoDoc = paciente.getTipoDoc();
+        this.documento = paciente.getDocumento();
+        this.estado = paciente.getEstado();
+        this.email = paciente.getEmail();
+        this.edad = paciente.getEdad();;
+    }
 
     public TipoDoc getTipoDoc() {
         return tipoDoc;

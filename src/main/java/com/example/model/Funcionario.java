@@ -29,6 +29,9 @@ public class Funcionario {
     @Column( name = "apellidos")
     private String apellido;
 
+    @Column(nullable = false, name = "documento")
+    private int documento;
+
     @Column(nullable = false, name = "especialidad")
     private String especialidad;
 
@@ -51,6 +54,14 @@ public class Funcionario {
     @JsonIgnore
     private List<Sesion> sesions;
 
+
+    public int getDocumento() {
+        return documento;
+    }
+
+    public void setDocumento(int documento) {
+        this.documento = documento;
+    }
 
     public String getNombre() {
         return nombre;

@@ -75,10 +75,15 @@ public class FuncionarioService {
 
     public RegistrationResponse paso2(Long idFuncionario, RegistrationRequest registrationRequest, Locale locale) {
 
-        String mensaje = messageSource.getMessage("user.not.found", null, locale);
+        Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
+                .orElseThrow(() -> new IllegalArgumentException(messageSource.getMessage("funcionario.register", null, locale)));
 
         if (userRepository.findByEmail(registrationRequest.getEmail()) != null) {
-            throw new IllegalArgumentException(messageSource.getMessage("email.not.found", null, locale));
+            throw new IllegalArgumentException(messageSource.getMessage("email.use", null, locale));
+        }
+
+        if (funcionarioRepository.findByDocumento(registrationRequest.getDocumento()) != null){
+            throw new IllegalArgumentException(messageSource.getMessage("doc.register", null, locale));
         }
 
         if (userRepository.findByUsername(registrationRequest.getUsername()) != null) {
@@ -87,8 +92,7 @@ public class FuncionarioService {
 
         ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "PSICOLOGO");
 
-        Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
-                .orElseThrow(() -> new IllegalArgumentException(mensaje));
+
 
 
 
@@ -102,6 +106,7 @@ public class FuncionarioService {
 
         userRepository.save(usuario);
 
+        funcionario.setDocumento(registrationRequest.getDocumento());
         funcionario.setUser(usuario);
         funcionarioRepository.save(funcionario);
 

@@ -4,11 +4,15 @@ package com.example.controller;
 import com.example.model.HistorialClinico;
 import com.example.repository.HistorialClinicoRepository;
 import com.example.security.dto.HistorialClinicoDto;
+import com.example.security.dto.HistorialClinicoResponse;
+import com.example.security.service.UserServiceImpl;
 import com.example.service.HistorialClinicoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Locale;
 
 @RestController
@@ -17,25 +21,37 @@ public class HistorialClinicoController {
 
     private final HistorialClinicoService historialClinicoService;
     private final HistorialClinicoRepository historialClinicoRepository;
+    private final UserServiceImpl userService;
 
-    public HistorialClinicoController(HistorialClinicoService historialClinicoService, HistorialClinicoRepository historialClinicoRepository) {
+    public HistorialClinicoController(HistorialClinicoService historialClinicoService, HistorialClinicoRepository historialClinicoRepository, UserServiceImpl userService) {
         this.historialClinicoService = historialClinicoService;
         this.historialClinicoRepository = historialClinicoRepository;
+        this.userService = userService;
     }
 
     @PostMapping("/crearHistorial/{idPaciente}")
-    public ResponseEntity<HistorialClinico> crearHistorial(@PathVariable Long idPaciente, @RequestBody HistorialClinicoDto request, Locale locale){
+    @PreAuthorize("hasRole('PSICOLOGO')")
+    public ResponseEntity<?> crearHistorial(@PathVariable Long idPaciente, @RequestBody HistorialClinicoDto request, Locale locale){
         try {
             HistorialClinico historial = historialClinicoService.crearHistorial(idPaciente, request, locale);
             return ResponseEntity.status(HttpStatus.CREATED).body(historial);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
         }
     }
+
     @GetMapping("/consultarHistorial/{pacienteId}")
-    public ResponseEntity<HistorialClinicoDto> getHistorialClinico(@PathVariable Long pacienteId, Locale locale) {
-        HistorialClinicoDto historialClinicoDto = historialClinicoService.getHistorialClinico(pacienteId, locale);
-        return ResponseEntity.ok(historialClinicoDto);
+    public ResponseEntity<?> getHistorialClinico(@PathVariable Long pacienteId, Locale locale) {
+        try {
+            HistorialClinicoResponse response = historialClinicoService.getHistorialClinico(pacienteId, locale);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
+        }
     }
 
     @PutMapping("/actualizarHistorial/{id}")
