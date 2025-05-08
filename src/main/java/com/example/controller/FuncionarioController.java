@@ -20,6 +20,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/funcionario")
+@CrossOrigin(origins = "http://localhost:5173")
+
 public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;
@@ -41,14 +43,13 @@ public class FuncionarioController {
     }
 
     @PostMapping("/paso1")
-    ResponseEntity<Funcionario> nombresApellidos(@RequestBody FuncionarioPaso1Request paso1) {
-        if (paso1.getNombre() == null || paso1.getApellido() == null || paso1.getNombre().isEmpty() || paso1.getApellido().isEmpty()){
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        Funcionario funcionario = funcionarioService.paso1(paso1);
-
-        return ResponseEntity.ok(funcionario);
+    ResponseEntity<?> nombresApellidos(@RequestBody FuncionarioPaso1Request paso1, Locale locale) {
+       try {
+           Funcionario funcionario = funcionarioService.paso1(paso1, locale);
+           return ResponseEntity.ok(funcionario);
+       } catch (IllegalArgumentException e) {
+           return ResponseEntity.badRequest().body(new RegistrationResponse(e.getMessage()));
+       }
     }
 
     @PostMapping("/paso2/{idFuncionario}")
@@ -65,17 +66,22 @@ public class FuncionarioController {
 
 
     @PostMapping("/paso3/{idUsuario}")
-    public ResponseEntity<Funcionario> registroFuncionario(@PathVariable Long idUsuario, @RequestBody Funcionario funcionario, Locale locale) {
-        Funcionario paso3 = funcionarioService.paso3(idUsuario, funcionario, locale);
-        return new ResponseEntity<>(paso3, HttpStatus.CREATED);
+    public ResponseEntity<?> registroFuncionario(@PathVariable Long idUsuario, @RequestBody Funcionario funcionario, Locale locale) {
+       try {
+           Funcionario paso3 = funcionarioService.paso3(idUsuario, funcionario, locale);
+           return new ResponseEntity<>(paso3, HttpStatus.CREATED);
+
+       } catch (IllegalArgumentException e) {
+           return ResponseEntity.badRequest().body(new RegistrationResponse(e.getMessage()));
+       }
     }
 
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id) {
+    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id, Locale locale) {
         try {
-            String mensaje = funcionarioService.eliminarFuncionario(id);
+            String mensaje = funcionarioService.eliminarFuncionario(id, locale);
             return ResponseEntity.ok(mensaje);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(e.getMessage());

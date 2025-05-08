@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.model.User;
 import com.example.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -18,20 +19,21 @@ import java.util.UUID;
 @Service
 public class PasswordResetService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final JavaMailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
 
     @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private MessageSource messageSource;
-
+    public PasswordResetService(UserRepository userRepository, JavaMailSender mailSender, PasswordEncoder passwordEncoder, MessageSource messageSource) {
+        this.userRepository = userRepository;
+        this.mailSender = mailSender;
+        this.passwordEncoder = passwordEncoder;
+        this.messageSource = messageSource;
+    }
 
 
+    @Transactional
     public void recuperarPassword(String email, Locale locale) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
@@ -60,6 +62,7 @@ public class PasswordResetService {
         mailSender.send(correo);
     }
 
+    @Transactional
     public void validarToken(String token) {
         User usuario = userRepository.findByResetToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("Token no válido."));
@@ -69,6 +72,7 @@ public class PasswordResetService {
         }
     }
 
+    @Transactional
     public void cambiarPassword(String token, String nueva) {
         User user = userRepository.findByResetToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("Token inválido."));

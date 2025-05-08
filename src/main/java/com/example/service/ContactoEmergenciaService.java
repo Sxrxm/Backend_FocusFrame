@@ -3,8 +3,10 @@ package com.example.service;
 import com.example.model.ContactoEmergencia;
 import com.example.repository.ContactoEmergenciaRepository;
 import com.example.security.dto.HistorialClinicoDto;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Optional;
 
@@ -18,19 +20,24 @@ public class ContactoEmergenciaService {
         this.contactoEmergenciaRepository = contactoEmergenciaRepository;
     }
 
-    public ContactoEmergencia crearContactoEmergencia(ContactoEmergencia contactoEmergencia) {
-        return contactoEmergenciaRepository.save(contactoEmergencia);
+    @Transactional
+    public ContactoEmergencia crearContactoEmergencia(@RequestBody HistorialClinicoDto.ContactoEmergenciaDto dto) {
+        ContactoEmergencia contacto = new ContactoEmergencia();
+        contacto.setNombre(dto.getNombre());
+        contacto.setApellido(dto.getApellido());
+        contacto.setParentesco(dto.getParentesco());
+        contacto.setTelefono(dto.getTelefono());
+        return contactoEmergenciaRepository.save(contacto);
     }
-
     public Optional<ContactoEmergencia> obtenerContactoEmergencia(Long id) {
         return contactoEmergenciaRepository.findById(id);
     }
 
+    @Transactional
     public ContactoEmergencia actualizarContactoEmergencia(Long id, HistorialClinicoDto.ContactoEmergenciaDto contactoEmergenciaDto) {
         ContactoEmergencia contactoEmergencia = contactoEmergenciaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contacto de emergencia no encontrado"));
 
-        // Actualizar los campos del contacto de emergencia
         contactoEmergencia.setNombre(contactoEmergenciaDto.getNombre());
         contactoEmergencia.setApellido(contactoEmergenciaDto.getApellido());
         contactoEmergencia.setParentesco(contactoEmergenciaDto.getParentesco());

@@ -15,11 +15,11 @@ public class SesionResponse {
     private Long idPaciente;
     private LocalDate fechaSesion;
     private LocalTime hora;
-    private BigDecimal monto;
-    private Sesion.MetodoPago metodoPago;
     private Sesion.EstadoSesion estado;
 
-    public SesionResponse(Long id, String nombre, String nombreP, String nombreF, Long idFuncionario, Long idPaciente, LocalDate fechaSesion, LocalTime hora, BigDecimal monto, Sesion.MetodoPago metodoPago, Sesion.EstadoSesion estado) {
+
+
+    public SesionResponse(Long id, String nombre, String nombreP, String nombreF, Long idFuncionario, Long idPaciente, LocalDate fechaSesion, LocalTime hora, Sesion.EstadoSesion estado) {
         this.id = id;
         this.nombre = nombre;
         this.nombreP = nombreP;
@@ -28,8 +28,6 @@ public class SesionResponse {
         this.idPaciente = idPaciente;
         this.fechaSesion = fechaSesion;
         this.hora = hora;
-        this.monto = monto;
-        this.metodoPago = metodoPago;
         this.estado = estado;
     }
 
@@ -97,21 +95,6 @@ public class SesionResponse {
         this.hora = hora;
     }
 
-    public BigDecimal getMonto() {
-        return monto;
-    }
-
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
-
-    public Sesion.MetodoPago getMetodoPago() {
-        return metodoPago;
-    }
-
-    public void setMetodoPago(Sesion.MetodoPago metodoPago) {
-        this.metodoPago = metodoPago;
-    }
 
     public Sesion.EstadoSesion getEstado() {
         return estado;

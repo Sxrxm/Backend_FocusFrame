@@ -104,9 +104,9 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    ResponseEntity<RegistrationResponse> register(@RequestBody RegistrationRequest registrationRequest) {
+    ResponseEntity<RegistrationResponse> register(@RequestBody RegistrationRequest registrationRequest, Locale locale) {
         try {
-            RegistrationResponse response = userService.registration(registrationRequest);
+            RegistrationResponse response = userService.registration(registrationRequest, locale);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new RegistrationResponse(e.getMessage()));
@@ -135,7 +135,7 @@ public class AuthController {
     public ResponseEntity<?> restablecerContra(@RequestParam String token, @RequestBody RecuperarContraRequest request, Locale locale) {
 
         if (!request.getNueva().equals(request.getConfirmar())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Las contraseñas no coinciden.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Las contrasenas no coinciden.");
         }
 
         try {
@@ -157,16 +157,16 @@ public class AuthController {
         }
 
         if (!passwordEncoder.matches(request.getActual(), usuario.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Contraseña actual incorrecta.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Contrasena actual incorrecta.");
         }
 
         if (!request.getNueva().equals(request.getConfirmar())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Las contraseñas no coinciden.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Las contrasenas no coinciden.");
         }
 
         usuario.setPassword(passwordEncoder.encode(request.getNueva()));
         userRepository.save(usuario);
-        return ResponseEntity.ok("Contraseña cambiada con éxito.");
+        return ResponseEntity.ok("Contraseña cambiada con exito.");
     }
 
 
@@ -177,7 +177,7 @@ public class AuthController {
             return ResponseEntity.ok().body(
                     Map.of(
                             "valid", true,
-                            "message", "Token válido",
+                            "message", "Token valido",
                             "token", token
                     )
             );

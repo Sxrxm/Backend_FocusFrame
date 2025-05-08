@@ -57,6 +57,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers("/auth/recuperarContra").permitAll()
                         .requestMatchers("/auth/recuperar-contrasena").permitAll()
@@ -69,6 +70,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}").hasAuthority("PSICOLOGO")
                         .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}").hasRole("PACIENTE")
                         .requestMatchers(HttpMethod.POST,"/historialClinico/crearHistorial/{idPaciente}").hasAuthority("PSICOLOGO")
+                        .requestMatchers(HttpMethod.POST, "/terapia/crear").hasAuthority("PSICOLOGO")
                         .requestMatchers("/sesion/createSesion").hasAuthority("PSICOLOGO")
                         .requestMatchers("/sesion/createSesion").hasRole("PACIENTE")
                         .anyRequest().authenticated()
@@ -95,12 +97,5 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("Content-Type", "Authorization")
-                .allowCredentials(true);
-    }
+
 }

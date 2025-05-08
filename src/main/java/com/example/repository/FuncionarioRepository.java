@@ -12,5 +12,6 @@ import java.util.Optional;
 public interface FuncionarioRepository extends JpaRepository<Funcionario, Long> {
     Optional<Funcionario> findById(Long id);
     Optional<Funcionario> findByUserId(Long userId);
+    Optional<Funcionario> findByUserEmail(String email);
     Funcionario findByDocumento(int documento);
 }

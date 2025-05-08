@@ -3,6 +3,7 @@ package com.example.service;
 import com.example.model.Paciente;
 import com.example.model.User;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,6 +20,7 @@ public class EmailService {
 
     private User user;
 
+    @Transactional
     public void enviarCorreoConEnlace(String email, String enlace, User user, Paciente paciente) {
         if (email == null || email.isEmpty()) {
             System.err.println("Error: El correo electrónico es nulo o vacío.");

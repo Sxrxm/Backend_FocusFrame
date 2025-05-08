@@ -1,49 +1,47 @@
 package com.example.service;
 
-import com.auth0.jwt.JWT;
-import com.example.model.User;
 import com.example.repository.UserRepository;
 import com.example.security.dto.RegistrationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
-import java.util.Base64;
+
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class UserValidationService {
 
-	@Value("${jwt.secretKey}")
-	private String secretKey;
+	private final UserRepository userRepository;
+    private final MessageSource messageSource;
 
-	@Autowired
-	private UserRepository userRepository;
-
-	public UserValidationService(UserRepository userRepository) {
+    @Autowired
+	public UserValidationService(UserRepository userRepository, MessageSource messageSource) {
 		this.userRepository = userRepository;
-	}
+        this.messageSource = messageSource;
+    }
 
 
-	public void validateUser(RegistrationRequest registrationRequest) {
+	public void validateUser(RegistrationRequest registrationRequest, Locale locale) {
 		if (userRepository.findByEmail(registrationRequest.getEmail()) != null) {
-			throw new IllegalArgumentException("El correo electrónico ya está registrado");
+            throw new IllegalArgumentException(messageSource.getMessage("email.use", null, locale));
 		}
 		if (userRepository.findByUsername(registrationRequest.getUsername()) != null) {
-			throw new IllegalArgumentException("Este nombre de usuario ya se encuentra en uso.");
+            throw new IllegalArgumentException(messageSource.getMessage("username.found",null,locale));
 		}
 
 		if (registrationRequest.getPassword().length() < 12) {
-			throw new IllegalArgumentException("La contraseña debe tener al menos 12 caracteres");
+			throw new IllegalArgumentException(messageSource.getMessage("password.too.short", null, locale));
 		}
 
 		if (registrationRequest.getEmail().length() < 8) {
-			throw new IllegalArgumentException("Ingrese un correo valido");
+			throw new IllegalArgumentException(messageSource.getMessage("email.too.short", null, locale));
 		}
 		if (!isValidEmail(registrationRequest.getEmail())) {
-			throw new IllegalArgumentException(("El correo electronico no es valido"));
+			throw new IllegalArgumentException((messageSource.getMessage("email.invalid", null, locale)));
 		}
 	}
 

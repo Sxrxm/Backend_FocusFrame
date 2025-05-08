@@ -28,9 +28,15 @@ public class Sesion {
     @JsonIgnore
     private Paciente paciente;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "historialClinico_id", nullable = false)
+    @JoinColumn(name = "terapia_id", nullable = false)
+    private Terapia terapia;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idHistorialClinico")
     private HistorialClinico historialClinico;
+
 
     @Column(nullable = false, length = 100, name = "nombre")
     private String nombre;
@@ -45,21 +51,10 @@ public class Sesion {
     @Column(nullable = false, name = "hora")
     private LocalTime hora;
 
-    @Column(name = "monto", nullable = false, precision = 10, scale = 2)
-    private BigDecimal monto;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "metodo_pago", nullable = false)
-    private MetodoPago metodoPago;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
     private EstadoSesion estado;
 
-
-    public enum MetodoPago {
-        EFECTIVO, TARJETA, TRANSFERENCIA
-    }
 
     public enum EstadoSesion {
         PENDIENTE, CONFIRMADA, CANCELADA, FINALIZADA
@@ -72,12 +67,13 @@ public class Sesion {
             this.fechaRegistro = new Date();
     }
 
-    public HistorialClinico getHistorialClinico() {
-        return historialClinico;
+
+    public Terapia getTerapia() {
+        return terapia;
     }
 
-    public void setHistorialClinico(HistorialClinico historialClinico) {
-        this.historialClinico = historialClinico;
+    public void setTerapia(Terapia terapia) {
+        this.terapia = terapia;
     }
 
     public Long getId() {
@@ -136,21 +132,6 @@ public class Sesion {
         this.hora = hora;
     }
 
-    public BigDecimal getMonto() {
-        return monto;
-    }
-
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
-
-    public MetodoPago getMetodoPago() {
-        return metodoPago;
-    }
-
-    public void setMetodoPago(MetodoPago metodoPago) {
-        this.metodoPago = metodoPago;
-    }
 
     public EstadoSesion getEstado() {
         return estado;

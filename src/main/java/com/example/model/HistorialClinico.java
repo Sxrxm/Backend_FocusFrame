@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "historial_clinico")
@@ -22,11 +23,11 @@ public class HistorialClinico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "idHistorialClinico", nullable = false)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "paciente_id", referencedColumnName = "id_paciente")
+    @JoinColumn(name = "idPaciente", referencedColumnName = "idPaciente")
     private Paciente paciente;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,15 +43,11 @@ public class HistorialClinico {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "ultima_actualizacion")
-    private LocalDateTime ultimaActualizacion;
+    private Date ultimaActualizacion;
 
+    @OneToMany(mappedBy = "historialClinico")
+    private Set<Terapia> terapias;
 
-
-    @OneToMany(mappedBy = "historialClinico", fetch = FetchType.LAZY)
-    private List<Sesion> sesiones;
-
-    //@OneToMany(mappedBy = "historialClinico", cascade = CascadeType.ALL, orphanRemoval = true)
-    //private List<Sesion> sessions = new ArrayList<>();
 
 
     @Enumerated(EnumType.STRING)
@@ -91,7 +88,7 @@ public class HistorialClinico {
 
     public enum Medicamentos {
         Metformina,
-        Losartán,
+        Losartan,
         Salbutamol,
         Fluoxetina,
         Alprazolam,
@@ -129,6 +126,17 @@ public class HistorialClinico {
     }
 
 
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public Set<Terapia> getTerapias() {
+        return terapias;
+    }
+
+    public void setTerapias(Set<Terapia> terapias) {
+        this.terapias = terapias;
+    }
 
     public HistorialClinico() {
     }
@@ -162,11 +170,11 @@ public class HistorialClinico {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public LocalDateTime getUltimaActualizacion() {
+    public Date getUltimaActualizacion() {
         return ultimaActualizacion;
     }
 
-    public void setUltimaActualizacion(LocalDateTime ultimaActualizacion) {
+    public void setUltimaActualizacion(Date ultimaActualizacion) {
         this.ultimaActualizacion = ultimaActualizacion;
     }
 

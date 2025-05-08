@@ -7,19 +7,30 @@ import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.PacienteRepository;
 import com.example.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
 public class PacienteService {
 
+
+    private final PacienteRepository pacienteRepository;
+    private final UserRepository userRepository;
+    private final MessageSource messageSource;
+
     @Autowired
-    private PacienteRepository pacienteRepository;
-    @Autowired
-    private UserRepository userRepository;
+    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository, MessageSource messageSource) {
+        this.pacienteRepository = pacienteRepository;
+        this.userRepository = userRepository;
+        this.messageSource = messageSource;
+    }
 
 
     public Paciente buscarPacientePorId(Long id) {
@@ -30,6 +41,7 @@ public class PacienteService {
         return pacienteRepository.findAll();
     }
 
+    @Transactional
     public Paciente actualizarPaciente(Long id,Paciente paciente) {
         if (pacienteRepository.existsById(id)) {
             paciente.setIdPaciente(id);
@@ -39,7 +51,8 @@ public class PacienteService {
         }
     }
 
-    public Paciente desactivarPaciente(Long pacienteId) {
+    @Transactional
+    public Paciente desactivarPaciente(Long pacienteId, Locale locale) {
         Optional<Paciente> pacienteExistente = pacienteRepository.findById(pacienteId);
 
         if(pacienteExistente.isPresent()) {
@@ -47,13 +60,14 @@ public class PacienteService {
             paciente.setEstado(false);
             return pacienteRepository.save(paciente);
         } else {
-            throw new RuntimeException("Paciente no encontrado");
+            throw new EntityNotFoundException(messageSource.getMessage("patient.not.found", null, locale));
         }
     }
 
-    public String eliminarPaciente(Long pacienteId) {
+    @Transactional
+    public String eliminarPaciente(Long pacienteId, Locale locale) {
         Paciente paciente = pacienteRepository.findById(pacienteId)
-                .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null,locale)));
 
         pacienteRepository.delete(paciente);
         User usuario = paciente.getUser();
@@ -63,9 +77,10 @@ public class PacienteService {
         return "Paciente y usuario eliminados";
     }
 
-    public List<Sesion> obtenerSesionesDePaciente(Long pacienteId) {
+    @Transactional
+    public List<Sesion> obtenerSesionesDePaciente(Long pacienteId, Locale locale) {
         Paciente paciente = pacienteRepository.findById(pacienteId)
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null,locale)));
 
         return paciente.getSesions();
     }

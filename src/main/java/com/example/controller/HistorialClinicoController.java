@@ -17,6 +17,7 @@ import java.util.Locale;
 
 @RestController
 @RequestMapping("/historialClinico")
+@CrossOrigin(origins = "http://localhost:5173")
 public class HistorialClinicoController {
 
     private final HistorialClinicoService historialClinicoService;
@@ -49,8 +50,6 @@ public class HistorialClinicoController {
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
         }
     }
 

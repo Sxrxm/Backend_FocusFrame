@@ -6,6 +6,7 @@ public class HistorialClinicoResponse {
     private HistorialClinicoDto historialClinico;
     private PacienteResponse paciente;
 
+
     public HistorialClinicoResponse(HistorialClinicoDto dto, Paciente paciente) {
         this.historialClinico = dto;
         this.paciente = new PacienteResponse(paciente);

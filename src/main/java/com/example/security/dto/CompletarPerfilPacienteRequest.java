@@ -27,4 +27,6 @@ public class CompletarPerfilPacienteRequest {
     public void setPassword(@NotEmpty(message = "{registration_password_not_empty}") @Size(min = 8, message = "{registration_password_size}") String profilePassword) {
         this.password = profilePassword;
     }
+
+
 }

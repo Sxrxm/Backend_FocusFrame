@@ -4,6 +4,9 @@ package com.example.security.dto;
 import com.example.model.HistorialClinico;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -23,6 +26,114 @@ public class HistorialClinicoDto {
     private String observacionesGenerales;
 
     private ContactoEmergenciaDto contactoEmergencia;
+
+
+    private List<TerapiaDto> terapias;
+
+    public static class TerapiaDto {
+        private Long id;
+        private String descripcion;
+        private LocalDate fechaInicio;
+        private LocalDate fechaFin;
+        private List<SesionDto> sesiones;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public void setDescripcion(String descripcion) {
+            this.descripcion = descripcion;
+        }
+
+        public LocalDate getFechaInicio() {
+            return fechaInicio;
+        }
+
+        public void setFechaInicio(LocalDate fechaInicio) {
+            this.fechaInicio = fechaInicio;
+        }
+
+        public LocalDate getFechaFin() {
+            return fechaFin;
+        }
+
+        public void setFechaFin(LocalDate fechaFin) {
+            this.fechaFin = fechaFin;
+        }
+
+        public List<SesionDto> getSesiones() {
+            return sesiones;
+        }
+
+        public void setSesiones(List<SesionDto> sesiones) {
+            this.sesiones = sesiones;
+        }
+    }
+
+    public List<TerapiaDto> getTerapias() {
+        return terapias;
+    }
+
+    public void setTerapias(List<TerapiaDto> terapias) {
+        this.terapias = terapias;
+    }
+
+    public static class SesionDto {
+        private Long id;
+        private String nombre;
+        private LocalDate fechaSesion;
+        private LocalTime hora;
+        private String estado;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public void setNombre(String nombre) {
+            this.nombre = nombre;
+        }
+
+        public LocalDate getFechaSesion() {
+            return fechaSesion;
+        }
+
+        public void setFechaSesion(LocalDate fechaSesion) {
+            this.fechaSesion = fechaSesion;
+        }
+
+        public LocalTime getHora() {
+            return hora;
+        }
+
+        public void setHora(LocalTime hora) {
+            this.hora = hora;
+        }
+
+        public String getEstado() {
+            return estado;
+        }
+
+        public void setEstado(String estado) {
+            this.estado = estado;
+        }
+    }
+
 
 
     public List<HistorialClinico.Hobbies> getHobbies() {

@@ -11,30 +11,12 @@ import java.time.LocalTime;
 public class SesionRequest {
 
     private String nombre;
-    private Long idFuncionario;
+    private Long idTerapia;
     private Long idPaciente;
-    private String usernameF;
-    private String usernameP;
+    private Long idPsicologo;
     private LocalDate fechaSesion;
     private LocalTime hora;
-    private BigDecimal monto;
-    private Sesion.MetodoPago metodoPago;
 
-    public String getUsernameF() {
-        return usernameF;
-    }
-
-    public void setUsernameF(String usernameF) {
-        this.usernameF = usernameF;
-    }
-
-    public String getUsernameP() {
-        return usernameP;
-    }
-
-    public void setUsernameP(String usernameP) {
-        this.usernameP = usernameP;
-    }
 
     public String getNombre() {
         return nombre;
@@ -44,12 +26,13 @@ public class SesionRequest {
         this.nombre = nombre;
     }
 
-    public Long getIdFuncionario() {
-        return idFuncionario;
+
+    public Long getIdTerapia() {
+        return idTerapia;
     }
 
-    public void setIdFuncionario(Long idFuncionario) {
-        this.idFuncionario = idFuncionario;
+    public void setIdTerapia(Long idTerapia) {
+        this.idTerapia = idTerapia;
     }
 
     public Long getIdPaciente() {
@@ -76,19 +59,13 @@ public class SesionRequest {
         this.hora = hora;
     }
 
-    public BigDecimal getMonto() {
-        return monto;
+    public Long getIdPsicologo() {
+        return idPsicologo;
     }
 
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
+    public void setIdPsicologo(Long idPsicologo) {
+        this.idPsicologo = idPsicologo;
     }
 
-    public Sesion.MetodoPago getMetodoPago() {
-        return metodoPago;
-    }
 
-    public void setMetodoPago(Sesion.MetodoPago metodoPago) {
-        this.metodoPago = metodoPago;
-    }
 }

@@ -110,9 +110,9 @@ public class PacienteController {
 
 
     @PostMapping("/desactivar/{pacienteId}")
-    public ResponseEntity<Paciente> desactivarPaciente(@PathVariable Long pacienteId) {
+    public ResponseEntity<Paciente> desactivarPaciente(@PathVariable Long pacienteId, Locale locale) {
         try {
-            Paciente pacienteDessactivado = pacienteService.desactivarPaciente(pacienteId);
+            Paciente pacienteDessactivado = pacienteService.desactivarPaciente(pacienteId, locale);
             return new ResponseEntity<>(pacienteDessactivado, HttpStatus.OK);
         }catch (RuntimeException e){
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -120,9 +120,9 @@ public class PacienteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id) {
+    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id, Locale locale) {
         try {
-            String mensaje = pacienteService.eliminarPaciente(id);
+            String mensaje = pacienteService.eliminarPaciente(id, locale);
             return ResponseEntity.ok(mensaje);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(e.getMessage());

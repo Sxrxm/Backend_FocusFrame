@@ -15,6 +15,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,13 +53,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public RegistrationResponse registration(RegistrationRequest registrationRequest) {
+	public RegistrationResponse registration(RegistrationRequest registrationRequest, Locale locale) {
 
 		if (!validarContrasena(registrationRequest.getPassword())) {
 			return new RegistrationResponse("La contraseña debe contener al menos un carácter especial.");
 		}
 
-		userValidationService.validateUser(registrationRequest);
+		userValidationService.validateUser(registrationRequest, locale);
 
         if (registrationRequest.getUserRole() == UserRole.ADMIN) {
             ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "ADMIN");

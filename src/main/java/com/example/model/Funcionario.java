@@ -23,10 +23,10 @@ public class Funcionario {
     @Column(nullable = false, name = "id_funcionario")
     private Long idFuncionario;
 
-    @Column( name = "nombres")
+    @Column(name = "nombres")
     private String nombre;
 
-    @Column( name = "apellidos")
+    @Column(name = "apellidos")
     private String apellido;
 
     @Column(nullable = false, name = "documento")
@@ -50,10 +50,21 @@ public class Funcionario {
     @JoinColumn(name = "id_usuario")
     private User user;
 
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
+//    @JsonIgnore
+//    private List<Sesion> sesions;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
     @JsonIgnore
-    private List<Sesion> sesions;
+    private List<Terapia> terapia;
 
+    public List<Terapia> getTerapia() {
+        return terapia;
+    }
+
+    public void setTerapia(List<Terapia> terapia) {
+        this.terapia = terapia;
+    }
 
     public int getDocumento() {
         return documento;
@@ -127,11 +138,11 @@ public class Funcionario {
         this.user = user;
     }
 
-    public List<Sesion> getSesions() {
-        return sesions;
-    }
-
-    public void setSesions(List<Sesion> sesions) {
-        this.sesions = sesions;
-    }
+//    public List<Sesion> getSesions() {
+//        return sesions;
+//    }
+//
+//    public void setSesions(List<Sesion> sesions) {
+//        this.sesions = sesions;
+//    }
 }

@@ -22,7 +22,7 @@ public class Paciente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "id_paciente")
+    @Column(nullable = false, name = "idPaciente")
     private Long idPaciente;
 
     @Column(nullable = false, name = "nombre")
@@ -61,6 +61,10 @@ public class Paciente {
     @JsonIgnore
     private List<Sesion> sesions;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "paciente")
+    @JsonIgnore
+    private List<Terapia> terapia;
+
     @Column(name = "fecha_creacion")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Bogota")
     @Temporal(TemporalType.TIMESTAMP)
@@ -87,6 +91,14 @@ public class Paciente {
         return getEdad() < 18;
     }
 
+
+    public List<Terapia> getTerapia() {
+        return terapia;
+    }
+
+    public void setTerapia(List<Terapia> terapia) {
+        this.terapia = terapia;
+    }
 
     public HistorialClinico getHistorialClinico() {
         return historialClinico;

@@ -7,34 +7,42 @@ import com.example.security.dto.CompletarPerfilPacienteRequest;
 import com.example.security.dto.PacienteResponse;
 import com.example.security.jwt.JwtTokenManager;
 import com.example.security.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Locale;
 
 @Service
 public class CompletarPerfilPacienteService {
 
+    private final PacienteRepository pacienteRepository;
+    private final UserService userService;
+    private final JwtTokenManager jwtTokenManager;
+    private final MessageSource messageSource;
 
     @Autowired
-    private PacienteRepository pacienteRepository;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtTokenManager jwtTokenManager;
+    public CompletarPerfilPacienteService(PacienteRepository pacienteRepository, UserService userService, JwtTokenManager jwtTokenManager, MessageSource messageSource) {
+        this.pacienteRepository = pacienteRepository;
+        this.userService = userService;
+        this.jwtTokenManager = jwtTokenManager;
+        this.messageSource = messageSource;
+    }
 
     @Transactional
-    public PacienteResponse completarPerfil(Long pacienteId, CompletarPerfilPacienteRequest request, String token) {
+    public PacienteResponse completarPerfil(Long pacienteId, CompletarPerfilPacienteRequest request, String token, Locale locale) {
+
 
         String email = jwtTokenManager.getEmailFromToken(token);
         User usuario = userService.findByEmail(email);
 
         if (usuario == null) {
-            throw new IllegalArgumentException("Token no válido o usuario no encontrado");
+            throw new EntityNotFoundException(messageSource.getMessage("user.not.found", null,locale));
         }
 
-        Paciente paciente = pacienteRepository.findById(pacienteId).orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado"));
+        Paciente paciente = pacienteRepository.findById(pacienteId).orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null,locale)));
 
         if (paciente.getUser() == null || !paciente.getUser().getId().equals(usuario.getId())) {
             throw new IllegalArgumentException("El paciente no tiene un usuario asociado o los datos no coinciden");

@@ -11,6 +11,8 @@ import com.example.security.dto.FuncionarioPaso1Request;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
 import com.example.security.utils.ValidarEdad;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,42 +25,46 @@ import java.util.Optional;
 @Service
 public class FuncionarioService {
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-
-    @Autowired
-    private FuncionarioRepository funcionarioRepository;
-
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private final FuncionarioRepository funcionarioRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final MessageSource messageSource;
+    private final UserValidationService userValidationService;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private MessageSource messageSource;
-
-    public FuncionarioService(BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    public FuncionarioService(FuncionarioRepository funcionarioRepository, BCryptPasswordEncoder passwordEncoder, UserRepository userRepository, MessageSource messageSource, UserValidationService userValidationService) {
+        this.funcionarioRepository = funcionarioRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.messageSource = messageSource;
+        this.userValidationService = userValidationService;
     }
 
+
+    @Transactional
     public Optional<Funcionario> getFuncionarioById (Long id){
         return funcionarioRepository.findById(id);
     }
 
+
+    @Transactional
     public List<Funcionario> getAllFuncionario (){
         return funcionarioRepository.findAll();
     }
 
-    public Funcionario paso1(FuncionarioPaso1Request request) {
+
+    @Transactional
+    public Funcionario paso1(FuncionarioPaso1Request request, Locale locale) {
+
+        if (request.getNombre() == null || request.getNombre().trim().isEmpty() ||
+                request.getApellido() == null || request.getApellido().trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    messageSource.getMessage("nombre.apellido.required", null, locale));
+        }
+
 
         User usuario = new User();
         usuario.setUserRole(UserRole.PSICOLOGO);
-        usuario.setEmail(null);
-        usuario.setPassword(null);
-        usuario.setUsername(null);
-        usuario = userRepository.save(usuario);
 
 
         Funcionario funcionario = new Funcionario();
@@ -68,32 +74,26 @@ public class FuncionarioService {
         funcionario.setExperiencia("null");
         funcionario.setLicencia("null");
         funcionario.setEstado(false);
-        funcionario.setUser(usuario);
+
         return funcionarioRepository.save(funcionario);
 
     }
 
+    @Transactional
     public RegistrationResponse paso2(Long idFuncionario, RegistrationRequest registrationRequest, Locale locale) {
 
-        Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
-                .orElseThrow(() -> new IllegalArgumentException(messageSource.getMessage("funcionario.register", null, locale)));
+        userValidationService.validateUser(registrationRequest, locale);
 
-        if (userRepository.findByEmail(registrationRequest.getEmail()) != null) {
-            throw new IllegalArgumentException(messageSource.getMessage("email.use", null, locale));
-        }
+        Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("funcionario.not.found", null, locale)));
+
 
         if (funcionarioRepository.findByDocumento(registrationRequest.getDocumento()) != null){
             throw new IllegalArgumentException(messageSource.getMessage("doc.register", null, locale));
         }
 
-        if (userRepository.findByUsername(registrationRequest.getUsername()) != null) {
-            throw new IllegalArgumentException(messageSource.getMessage("username.found",null,locale));
-        }
 
         ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "PSICOLOGO");
-
-
-
 
 
         User usuario = new User();
@@ -110,16 +110,18 @@ public class FuncionarioService {
         funcionario.setUser(usuario);
         funcionarioRepository.save(funcionario);
 
-        return new RegistrationResponse("Usuario registrado exitosamente");
+        return new RegistrationResponse(messageSource.getMessage("user.register.success", null, locale));
     }
 
+
+    @Transactional
     public Funcionario paso3(Long idUsuario, Funcionario datosNuevos, Locale locale) {
 
         User usuario = userRepository.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException(messageSource.getMessage("user.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("user.not.found", null, locale)));
 
         Funcionario funcionarioExistente = funcionarioRepository.findByUserId(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Funcionario no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("funcionario.not.found", null, locale)));
 
         funcionarioExistente.setLicencia(datosNuevos.getLicencia());
         funcionarioExistente.setExperiencia(datosNuevos.getExperiencia());
@@ -130,10 +132,10 @@ public class FuncionarioService {
     }
 
 
-
-    public String eliminarFuncionario(Long funcionadioId) {
+    @Transactional
+    public String eliminarFuncionario(Long funcionadioId, Locale locale) {
         Funcionario funcionario = funcionarioRepository.findById(funcionadioId)
-                .orElseThrow(() -> new IllegalArgumentException("funcionario no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("funcionario.not.found", null,locale)));
 
         funcionarioRepository.delete(funcionario);
         User usuario = funcionario.getUser();
