@@ -18,9 +18,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class FuncionarioService {
@@ -80,7 +78,7 @@ public class FuncionarioService {
     }
 
     @Transactional
-    public RegistrationResponse paso2(Long idFuncionario, RegistrationRequest registrationRequest, Locale locale) {
+    public Map<String, Object> paso2(Long idFuncionario, RegistrationRequest registrationRequest, Locale locale) {
 
         userValidationService.validateUser(registrationRequest, locale);
 
@@ -88,9 +86,16 @@ public class FuncionarioService {
                 .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("funcionario.not.found", null, locale)));
 
 
+        String documento = String.valueOf(registrationRequest.getDocumento());
+
         if (funcionarioRepository.findByDocumento(registrationRequest.getDocumento()) != null){
             throw new IllegalArgumentException(messageSource.getMessage("doc.register", null, locale));
         }
+
+        if (documento == null || !documento.matches("\\d{6,11}")) {
+            throw new RuntimeException(messageSource.getMessage("doc.length.invalid", null, locale));
+        }
+
 
 
         ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "PSICOLOGO");
@@ -110,7 +115,9 @@ public class FuncionarioService {
         funcionario.setUser(usuario);
         funcionarioRepository.save(funcionario);
 
-        return new RegistrationResponse(messageSource.getMessage("user.register.success", null, locale));
+        Map<String, Object> response = new HashMap<>();
+        response.put("idusuario", usuario.getId());
+        return response;
     }
 
 

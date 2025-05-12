@@ -1,15 +1,12 @@
 package com.example.controller;
 
-import com.example.model.Paciente;
 import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.UserRepository;
 import com.example.security.dto.*;
 import com.example.security.service.AuthenticationService;
 import com.example.security.service.UserService;
-import com.example.security.utils.MessageSourceConfig;
 import com.example.service.PasswordResetService;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

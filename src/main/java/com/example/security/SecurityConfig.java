@@ -3,6 +3,11 @@ package com.example.security;
 import com.example.security.jwt.JwtAuthenticationFilter;
 import com.example.security.jwt.JwtTokenManager;
 import com.example.security.service.UserDetailsServiceImpl;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -57,6 +62,13 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/index.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers("/auth/recuperarContra").permitAll()
@@ -66,9 +78,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso1").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso2/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso3/**").permitAll()
-                        .requestMatchers( "/paciente/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}").hasAuthority("PSICOLOGO")
-                        .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}").hasRole("PACIENTE")
+                        .requestMatchers("/paciente/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}")
+                        .hasAnyAuthority("PSICOLOGO", "PACIENTE") // Unifica las rutas con roles
                         .requestMatchers(HttpMethod.POST,"/historialClinico/crearHistorial/{idPaciente}").hasAuthority("PSICOLOGO")
                         .requestMatchers(HttpMethod.POST, "/terapia/crear").hasAuthority("PSICOLOGO")
                         .requestMatchers("/sesion/createSesion").hasAuthority("PSICOLOGO")
@@ -81,6 +93,25 @@ public class SecurityConfig implements WebMvcConfigurer {
         return http.build();
     }
 
+    @Bean
+    public OpenAPI customOpenAPI() {
+        final String securitySchemeName = "bearerAuth";
+
+        return new OpenAPI()
+                .info(new Info()
+                        .title("API de FocusFrame")
+                        .version("1.0")
+                        .description("Documentación de la API protegida con JWT"))
+                .addSecurityItem(new SecurityRequirement()
+                        .addList(securitySchemeName))
+                .components(new Components()
+                        .addSecuritySchemes(securitySchemeName,
+                                new SecurityScheme()
+                                        .name(securitySchemeName)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -95,7 +126,4 @@ public class SecurityConfig implements WebMvcConfigurer {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-
-
 }

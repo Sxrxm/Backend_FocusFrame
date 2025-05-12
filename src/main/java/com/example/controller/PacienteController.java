@@ -66,6 +66,10 @@ public class PacienteController {
             String mensaje = ex.getMessage();
             Map<String, String> error = Map.of("error", mensaje);
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException ex) {
+            String mensaje = ex.getMessage();
+            Map<String, String> error = Map.of("error", mensaje);
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
     }
 
