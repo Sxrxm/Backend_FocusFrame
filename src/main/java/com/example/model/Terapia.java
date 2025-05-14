@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +52,7 @@ public class Terapia {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Tipo_terapia")
-    private List<TipoTerapia> TipoTerapia = new ArrayList<>();
+    private TipoTerapia TipoTerapia;
 
     public enum TipoTerapia {
         familiar,
@@ -63,11 +62,11 @@ public class Terapia {
         infantil
     }
 
-    public List<Terapia.TipoTerapia> getTipoTerapia() {
+    public Terapia.TipoTerapia getTipoTerapia() {
         return TipoTerapia;
     }
 
-    public void setTipoTerapia(List<Terapia.TipoTerapia> tipoTerapia) {
+    public void setTipoTerapia(Terapia.TipoTerapia tipoTerapia) {
         TipoTerapia = tipoTerapia;
     }
 

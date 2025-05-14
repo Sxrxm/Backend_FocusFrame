@@ -7,6 +7,7 @@ import com.example.security.dto.SesionRequest;
 import com.example.security.dto.SesionResponse;
 import com.example.security.jwt.JwtAuthenticationFilter;
 import com.example.service.SesionService;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,10 @@ public class SesionController {
         try {
             SesionResponse response = sesionService.registrarSesionPsicologo(request, locale);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
         }

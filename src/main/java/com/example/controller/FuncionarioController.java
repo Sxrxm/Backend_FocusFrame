@@ -1,8 +1,8 @@
 package com.example.controller;
 
 import com.example.model.Funcionario;
-import com.example.model.User;
 import com.example.security.dto.FuncionarioPaso1Request;
+import com.example.security.dto.FuncionarioPaso1Response;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
 import com.example.service.FuncionarioService;
@@ -15,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/funcionario")
@@ -51,7 +48,13 @@ public class FuncionarioController {
     public ResponseEntity<?> nombresApellidos(@RequestBody FuncionarioPaso1Request paso1, Locale locale) {
         try {
             Funcionario funcionario = funcionarioService.paso1(paso1, locale);
-            return ResponseEntity.ok(funcionario);
+            FuncionarioPaso1Response  response = new FuncionarioPaso1Response(
+                    funcionario.getIdFuncionario(),
+                    funcionario.getNombre(),
+                    funcionario.getApellido(),
+                    funcionario.getFechaCreacion()
+            );
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new RegistrationResponse(e.getMessage()));
         }

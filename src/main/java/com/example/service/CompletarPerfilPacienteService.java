@@ -54,7 +54,6 @@ public class CompletarPerfilPacienteService {
         pacienteRepository.save(paciente);
 
         PacienteResponse response = new PacienteResponse();
-        response.setIdPaciente(paciente.getIdPaciente());
         response.setUsername(usuario.getUsername());
         response.setEmail(usuario.getEmail());
         response.setTelefono(paciente.getTelefono());

@@ -68,6 +68,7 @@ public class FuncionarioService {
         Funcionario funcionario = new Funcionario();
         funcionario.setNombre(request.getNombre());
         funcionario.setApellido(request.getApellido());
+        funcionario.setFechaCreacion(new Date());
         funcionario.setEspecialidad("null");
         funcionario.setExperiencia("null");
         funcionario.setLicencia("null");

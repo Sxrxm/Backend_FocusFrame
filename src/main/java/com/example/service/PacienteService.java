@@ -11,8 +11,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -35,6 +37,10 @@ public class PacienteService {
 
     public Paciente buscarPacientePorId(Long id) {
         return pacienteRepository.findById(id).get();
+    }
+
+    public List<Paciente> buscarNombre(String nombre, Pageable pageable) {
+        return pacienteRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
     public List<Paciente> getAllPacientes() {

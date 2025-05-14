@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,8 +79,6 @@ public class PacienteController {
             @PathVariable Long pacienteId,
             @RequestBody CompletarPerfilPacienteRequest request, Locale locale) {
 
-
-
         Paciente paciente = pacienteRepository.findById(pacienteId).orElse(null);
         if (paciente == null || !paciente.getIdPaciente().equals(pacienteId)) {
             log.error("paciente no encontrado {}", pacienteId);
@@ -131,6 +130,11 @@ public class PacienteController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/buscarPaciente")
+    public List<Paciente> filtrarNombre(@RequestParam String nombre, Pageable pageable) {
+        return pacienteService.buscarNombre(nombre, pageable);
     }
 
 

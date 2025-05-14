@@ -7,12 +7,15 @@ import com.example.repository.HistorialClinicoRepository;
 import com.example.repository.PacienteRepository;
 import com.example.repository.TerapiaRepository;
 import com.example.security.dto.TerapiaRequest;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 public class TerapiaService {
@@ -28,6 +31,18 @@ public class TerapiaService {
         this.terapiaRepository = terapiaRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.pacienteRepository = pacienteRepository;
+    }
+
+    public Set<Terapia> getTerapiasPaciente (Long idPaciente, Locale locale) {
+        Paciente paciente =pacienteRepository.findById(idPaciente)
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null, locale )));
+
+        HistorialClinico historialClinico = paciente.getHistorialClinico();
+        if (historialClinico == null) {
+            throw new EntityNotFoundException(messageSource.getMessage("history.not.found", null, locale));
+        }
+
+        return historialClinico.getTerapias();
     }
 
    public Terapia crear (TerapiaRequest request, Locale locale) {
@@ -51,6 +66,7 @@ public class TerapiaService {
         terapia.setDescripcion(request.getDescripcion());
         terapia.setFechaInicio(request.getFechaInicio());
         terapia.setFechaFin(request.getFechaFin());
+        terapia.setTipoTerapia(request.getTipoTerapia());
         terapia.setFuncionario(funcionario);
         terapia.setPaciente(paciente);
         terapia.setHistorialClinico(historialClinico);

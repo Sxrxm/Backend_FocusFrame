@@ -2,6 +2,8 @@ package com.example.security.dto;
 
 import com.example.model.Sesion;
 import com.example.model.Terapia;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +15,8 @@ public class TerapiaRequest {
     private LocalDate fechaFin;
     private Long idPaciente;
     private Set<Sesion> sesiones;
+
+    @Enumerated(EnumType.STRING)
     private Terapia.TipoTerapia tipoTerapia;
 
     public Terapia.TipoTerapia getTipoTerapia() {

@@ -6,7 +6,6 @@ import com.example.model.TipoDoc;
 import java.time.LocalDate;
 
 public class PacienteResponse {
-    private Long idPaciente;
     private Long telefono;
     private LocalDate fechaNacimiento;
     private TipoDoc tipoDoc;
@@ -94,11 +93,5 @@ public class PacienteResponse {
         this.telefono = telefono;
     }
 
-    public Long getIdPaciente() {
-        return idPaciente;
-    }
 
-    public void setIdPaciente(Long idPaciente) {
-        this.idPaciente = idPaciente;
-    }
 }

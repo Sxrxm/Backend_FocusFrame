@@ -1,6 +1,7 @@
 package com.example.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Time;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -49,6 +51,12 @@ public class Funcionario {
     @JsonIgnore
     @JoinColumn(name = "id_usuario")
     private User user;
+
+    @Column(name = "fecha_creacion")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Bogota")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaCreacion;
+
 
 //    @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
 //    @JsonIgnore
@@ -138,7 +146,15 @@ public class Funcionario {
         this.user = user;
     }
 
-//    public List<Sesion> getSesions() {
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    //    public List<Sesion> getSesions() {
 //        return sesions;
 //    }
 //

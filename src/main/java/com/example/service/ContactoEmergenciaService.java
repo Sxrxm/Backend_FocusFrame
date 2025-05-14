@@ -27,6 +27,7 @@ public class ContactoEmergenciaService {
         contacto.setApellido(dto.getApellido());
         contacto.setParentesco(dto.getParentesco());
         contacto.setTelefono(dto.getTelefono());
+        contacto.setCorreo(dto.getCorreo());
         return contactoEmergenciaRepository.save(contacto);
     }
     public Optional<ContactoEmergencia> obtenerContactoEmergencia(Long id) {

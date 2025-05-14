@@ -59,6 +59,7 @@ public class SesionService {
     public Optional<Sesion> getSesionById(Long id) {
         return sesionRepository.findById(id);
     }
+
     public boolean isHorarioDisponible(Long idFuncionario, LocalDate fecha, LocalTime hora) {
         return sesionRepository.countByFuncionarioIdFuncionarioAndFechaSesionAndHora(idFuncionario, fecha, hora) == 0;
     }
