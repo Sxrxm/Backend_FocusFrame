@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 			return new RegistrationResponse("La contraseña debe contener al menos un carácter especial.");
 		}
 
-		userValidationService.validateUser(registrationRequest, locale);
+		userValidationService.validateUser(registrationRequest);
 
         if (registrationRequest.getUserRole() == UserRole.ADMIN) {
             ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "ADMIN");

@@ -11,11 +11,15 @@ import com.example.repository.UserRepository;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.exception.BadRequestException;
 import com.example.security.exception.EntityNotFoundException;
+import com.example.security.service.UserServiceImpl;
 import com.example.security.service.UserValidationService;
 import com.example.security.utils.ValidarEdad;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,6 +35,9 @@ public class FuncionarioService {
     private final MessageSource messageSource;
     private final UserValidationService userValidationService;
     private final FuncionarioMapper funcionarioMapper;
+
+
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     public FuncionarioService(FuncionarioRepository funcionarioRepository, BCryptPasswordEncoder passwordEncoder, UserRepository userRepository, MessageSource messageSource, UserValidationService userValidationService, FuncionarioMapper funcionarioMapper) {
@@ -74,25 +81,23 @@ public class FuncionarioService {
     }
 
     @Transactional
-    public Map<String, Object> paso2(Long idFuncionario, RegistrationRequest registrationRequest, Locale locale) {
+    public Map<String, Object> paso2(Long idFuncionario, RegistrationRequest registrationRequest) {
 
-       try{
-           Integer documento = registrationRequest.getDocumento();
+        Integer documento = registrationRequest.getDocumento();
 
-           if (documento == null || !documento.toString().matches("\\d{6,11}")) {
-               throw new BadRequestException("doc.length.invalid");
-           }
-           userValidationService.validateUser(registrationRequest, locale);
+        if (documento == null || !documento.toString().matches("\\d{6,11}")) {
+            throw new BadRequestException("doc.length.invalid");
+        }
+        userValidationService.validateUser(registrationRequest);
 
 
         Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
                 .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
 
-           if (funcionarioRepository.findByDocumento(registrationRequest.getDocumento()) != null) {
-               throw new BadRequestException("doc.register");
-           }
-
+        if (funcionarioRepository.findByDocumento(registrationRequest.getDocumento()) != null) {
+            throw new BadRequestException("doc.register");
+        }
 
 
         ValidarEdad.validarMayorDeEdad(registrationRequest.getFechaNacimiento(), "PSICOLOGO");
@@ -109,30 +114,10 @@ public class FuncionarioService {
 
         Map<String, Object> response = new HashMap<>();
         response.put("idusuario", usuario.getId());
+        log.info("Usuario creado correctamente con ID: {}", usuario.getId());
+
         return response;
 
-       } catch (EntityNotFoundException e) {
-           throw new EntityNotFoundException(e.getMessageKey(), e.getArgs());
-       } catch (Exception e) {
-           throw new EntityNotFoundException("operation.failed", null);
-       }
-
-
-//        User usuario = new User();
-//        usuario.setUserRole(UserRole.PSICOLOGO);
-//        usuario.setFechaNacimiento(registrationRequest.getFechaNacimiento());
-//        usuario.setTipoDoc(registrationRequest.getTipoDoc());
-//        usuario.setEmail(registrationRequest.getEmail());
-//        usuario.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-//        usuario.setUsername(registrationRequest.getUsername());
-//
-//
-//        funcionario.setDocumento(registrationRequest.getDocumento());
-//        funcionario.setUser(usuario);
-//        funcionarioRepository.save(funcionario);
-
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("idusuario", usuario.getId());
     }
 
 

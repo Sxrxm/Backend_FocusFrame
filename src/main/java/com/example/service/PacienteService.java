@@ -1,24 +1,22 @@
 package com.example.service;
 
 
-import com.example.model.Paciente;
-import com.example.model.Sesion;
-import com.example.model.User;
-import com.example.model.UserRole;
+import com.example.dto.CardPaciente;
+import com.example.model.*;
 import com.example.repository.PacienteRepository;
+import com.example.repository.TerapiaRepository;
 import com.example.repository.UserRepository;
 import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PacienteService {
@@ -26,13 +24,13 @@ public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
     private final UserRepository userRepository;
-    private final MessageSource messageSource;
+    private final TerapiaRepository terapiaRepository;
 
     @Autowired
-    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository, MessageSource messageSource) {
+    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository, TerapiaRepository terapiaRepository) {
         this.pacienteRepository = pacienteRepository;
         this.userRepository = userRepository;
-        this.messageSource = messageSource;
+        this.terapiaRepository = terapiaRepository;
     }
 
 
@@ -40,12 +38,43 @@ public class PacienteService {
         return pacienteRepository.findById(id).get();
     }
 
-    public Page<Paciente> buscarNombre(String nombre, String email, Pageable pageable) {
-        return pacienteRepository.findByNombreContainingIgnoreCaseAndEmailContainingIgnoreCase(nombre, email,pageable);
+    public List<Paciente> buscarNombre(String busqueda) {
+        return pacienteRepository.buscarPacientes(busqueda);
     }
 
-    public List<Paciente> getAllPacientes() {
-        return pacienteRepository.findAll();
+
+    public List<Paciente> buscarNombreEnCita(String busqueda) {
+        return pacienteRepository.buscarPacientes(busqueda);
+    }
+
+    @Transactional
+    public List<CardPaciente> cardPacientes() {
+        List<Terapia> terapias = terapiaRepository.findAll();
+
+        return terapias.stream().map(t -> {
+            int total = t.getNumeroSesiones();
+            long completada = t.getSesiones().stream().filter(s -> s.getEstado() == Sesion.EstadoSesion.FINALIZADA)
+                    .count();
+
+            boolean citasPendientes = t.getSesiones().stream()
+                    .anyMatch(s -> s.getEstado() == Sesion.EstadoSesion.PENDIENTE || s.getEstado() == Sesion.EstadoSesion.CONFIRMADA);
+
+            Date fechaCreacionHistorial = t.getHistorialClinico() != null ? t.getHistorialClinico().getFechaCreacion() : null;
+
+            double porcentajeTerapia = total == 0 ? 0 : (completada * 100.0) / total;
+
+            Paciente paciente = t.getPaciente();
+
+            return new CardPaciente(paciente.getNombre(),
+                    paciente.getEmail(),
+                    paciente.getTelefono(),
+                    paciente.getEstado(),
+                    fechaCreacionHistorial,
+                    (int) completada,
+                    total,
+                    porcentajeTerapia,
+                    citasPendientes);
+        } ).collect(Collectors.toList());
     }
 
     @Transactional

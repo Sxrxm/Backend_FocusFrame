@@ -41,6 +41,10 @@ public class Terapia {
     @JsonIgnore
     private HistorialClinico historialClinico;
 
+
+    @Column
+    private int numeroSesiones;
+
     @Column
     private String descripcion;
 
@@ -61,6 +65,15 @@ public class Terapia {
         individual,
         pareja,
         infantil
+    }
+
+
+    public int getNumeroSesiones() {
+        return numeroSesiones;
+    }
+
+    public void setNumeroSesiones(int numeroSesiones) {
+        this.numeroSesiones = numeroSesiones;
     }
 
     public Terapia.TipoTerapia getTipoTerapia() {

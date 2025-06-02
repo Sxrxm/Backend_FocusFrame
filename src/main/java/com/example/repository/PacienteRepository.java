@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +18,11 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByEmail(String email);
     List<Paciente> findByFuncionario_IdFuncionario(long funcionarioId);
 
-    Page<Paciente> findByNombreContainingIgnoreCaseAndEmailContainingIgnoreCase(String nombre, String email, Pageable pageable);
+
+    @Query("SELECT p FROM Paciente p WHERE " +
+            "LOWER(p.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+            "LOWER(p.apellido) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+            "LOWER(p.email) LIKE LOWER(CONCAT('%', :busqueda, '%'))")
+    List<Paciente> buscarPacientes(@Param("busqueda") String busqueda);
 
 }

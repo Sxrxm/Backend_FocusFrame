@@ -48,8 +48,16 @@ public class Sesion {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaRegistro;
 
-    @Column(nullable = false, name = "hora")
-    private LocalTime hora;
+    @Column(nullable = false)
+    private LocalTime horaInicio;
+
+    @Column(nullable = false)
+    private LocalTime horaFin;
+
+
+    @Column
+    private String notasAdicionales;
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
@@ -67,6 +75,13 @@ public class Sesion {
             this.fechaRegistro = new Date();
     }
 
+    public String getNotasAdicionales() {
+        return notasAdicionales;
+    }
+
+    public void setNotasAdicionales(String notasAdicionales) {
+        this.notasAdicionales = notasAdicionales;
+    }
 
     public Terapia getTerapia() {
         return terapia;
@@ -124,14 +139,30 @@ public class Sesion {
         this.fechaRegistro = fechaRegistro;
     }
 
-    public LocalTime getHora() {
-        return hora;
+    public LocalTime getHoraInicio() {
+        return horaInicio;
     }
 
-    public void setHora(LocalTime hora) {
-        this.hora = hora;
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
     }
 
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
+    }
+
+
+    public HistorialClinico getHistorialClinico() {
+        return historialClinico;
+    }
+
+    public void setHistorialClinico(HistorialClinico historialClinico) {
+        this.historialClinico = historialClinico;
+    }
 
     public EstadoSesion getEstado() {
         return estado;

@@ -62,19 +62,10 @@ public class PacienteController {
 
 
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarPaciente(@RequestBody RegistroPacienteRequest request, Locale locale) {
-        try {
-            Paciente paciente = registroPacienteService.registrarPaciente(request, locale);
+    public ResponseEntity<?> registrarPaciente(@RequestBody RegistroPacienteRequest request) {
+            Paciente paciente = registroPacienteService.registrarPaciente(request);
             return new ResponseEntity<>(paciente, HttpStatus.CREATED);
-        } catch (IllegalArgumentException ex) {
-            String mensaje = ex.getMessage();
-            Map<String, String> error = Map.of("error", mensaje);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException ex) {
-            String mensaje = ex.getMessage();
-            Map<String, String> error = Map.of("error", mensaje);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+
     }
 
     @PostMapping("/completar-perfil/{pacienteId}")
@@ -111,6 +102,12 @@ public class PacienteController {
 
 
 
+//    @GetMapping("/nombreEnCita")
+//    public List<Paciente> buscarEnSesion(@RequestParam String nombre, String email){
+//        return pacienteRepository.findByNombreContainingIgnoreCaseAndEmailContainingIgnoreCase(nombre, email);
+//    }
+
+
 
     @PostMapping("/desactivar/{pacienteId}")
     public ResponseEntity<Paciente> desactivarPaciente(@PathVariable Long pacienteId) {
@@ -128,15 +125,12 @@ public class PacienteController {
 
 
     @GetMapping("/buscarPaciente")
-    public Page<Paciente> filtrarPorNombreEmail(@RequestParam String nombre,String email,  Pageable pageable) {
-        return pacienteService.buscarNombre(nombre, email,pageable);
+    public List<Paciente> filtrarPorNombreEmail(@RequestParam String busqueda) {
+        return pacienteService.buscarNombre(busqueda);
     }
 
 
-    @GetMapping("/pacientes")
-    public List<Paciente> getAllPacientes() {
-        return pacienteService.getAllPacientes();
-    }
+
 
 
     @PutMapping("/actualizarPaciente")

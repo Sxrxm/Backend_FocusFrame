@@ -2,6 +2,7 @@ package com.example.security.service;
 
 import com.example.repository.UserRepository;
 import com.example.security.dto.RegistrationRequest;
+import com.example.security.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -23,23 +24,23 @@ public class UserValidationService {
     }
 
 
-	public void validateUser(RegistrationRequest registrationRequest, Locale locale) {
+	public void validateUser(RegistrationRequest registrationRequest) {
 		if (userRepository.findByEmail(registrationRequest.getEmail()) != null) {
-            throw new IllegalArgumentException(messageSource.getMessage("email.use", null, locale));
+            throw new BadRequestException("email.use");
 		}
 		if (userRepository.findByUsername(registrationRequest.getUsername()) != null) {
-            throw new IllegalArgumentException(messageSource.getMessage("username.found",null,locale));
+            throw new BadRequestException("username.found");
 		}
 
 		if (registrationRequest.getPassword().length() < 12) {
-			throw new IllegalArgumentException(messageSource.getMessage("password.too.short", null, locale));
+			throw new BadRequestException("password.too.short");
 		}
 
 		if (registrationRequest.getEmail().length() < 8) {
-			throw new IllegalArgumentException(messageSource.getMessage("email.too.short", null, locale));
+			throw new BadRequestException("email.too.short");
 		}
 		if (!isValidEmail(registrationRequest.getEmail())) {
-			throw new IllegalArgumentException((messageSource.getMessage("email.invalid", null, locale)));
+			throw new BadRequestException("email.invalid");
 		}
 	}
 

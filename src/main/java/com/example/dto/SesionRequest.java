@@ -12,8 +12,21 @@ public class SesionRequest {
     private Long idPaciente;
     private Long idPsicologo;
     private LocalDate fechaSesion;
-    private LocalTime hora;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
+    private String notasAdicionales;
 
+    public String getNotasAdicionales() {
+        return notasAdicionales;
+    }
+
+    public void setNotasAdicionales(String notasAdicionales) {
+        this.notasAdicionales = notasAdicionales;
+    }
+
+    public boolean isHorarioValido() {
+        return horaFin.isAfter(horaInicio);
+    }
 
     public String getNombre() {
         return nombre;
@@ -48,12 +61,20 @@ public class SesionRequest {
         this.fechaSesion = fechaSesion;
     }
 
-    public LocalTime getHora() {
-        return hora;
+    public LocalTime getHoraInicio() {
+        return horaInicio;
     }
 
-    public void setHora(LocalTime hora) {
-        this.hora = hora;
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
+    }
+
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
     }
 
     public Long getIdPsicologo() {

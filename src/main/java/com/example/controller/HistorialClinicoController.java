@@ -47,8 +47,8 @@ public class HistorialClinicoController {
 
     @PutMapping("/actualizarHistorial/{id}")
     public ResponseEntity<HistorialClinico> actualizarHistorialClinico(@PathVariable Long id,
-                                                                       @RequestBody HistorialClinicoDto historialClinicoDto, Locale locale) {
-        HistorialClinico historialClinico = historialClinicoService.actualizarHistorialClinico(id, historialClinicoDto, locale);
+                                                                       @RequestBody HistorialClinicoDto historialClinicoDto) {
+        HistorialClinico historialClinico = historialClinicoService.actualizarHistorialClinico(id, historialClinicoDto);
         return ResponseEntity.ok(historialClinico);
     }
 }

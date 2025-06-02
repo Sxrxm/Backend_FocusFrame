@@ -2,6 +2,7 @@ package com.example.security.service;
 
 import com.example.model.User;
 import com.example.repository.UserRepository;
+import com.example.security.exception.EntityNotFoundException;
 import com.example.security.jwt.JwtTokenManager;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class AuthenticationService {
             User user = userRepository.findByEmail(email);
             if (user == null) {
                 log.warn("Usuario no encontrado con correo: {}", email);
-                throw new UsernameNotFoundException("Usuario no encontrado");
+                throw new EntityNotFoundException("user.not.found");
             }
 
             log.info("Usuario encontrado: {}", user.getEmail());

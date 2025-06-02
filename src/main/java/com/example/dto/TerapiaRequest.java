@@ -14,6 +14,7 @@ public class TerapiaRequest {
     private LocalDate fechaFin;
     private Long idPaciente;
     private Set<Sesion> sesiones;
+    private int numeroSesiones;
 
     @Enumerated(EnumType.STRING)
     private Terapia.TipoTerapia tipoTerapia;
@@ -57,6 +58,14 @@ public class TerapiaRequest {
 
     public void setIdPaciente(Long idPaciente) {
         this.idPaciente = idPaciente;
+    }
+
+    public int getNumeroSesiones() {
+        return numeroSesiones;
+    }
+
+    public void setNumeroSesiones(int numeroSesiones) {
+        this.numeroSesiones = numeroSesiones;
     }
 
     public Set<Sesion> getSesiones() {

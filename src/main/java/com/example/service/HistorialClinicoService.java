@@ -137,7 +137,7 @@ public class HistorialClinicoService {
                 sesionDto.setId(sesion.getId());
                 sesionDto.setNombre(sesion.getNombre());
                 sesionDto.setFechaSesion(sesion.getFechaSesion());
-                sesionDto.setHora(sesion.getHora());
+                sesionDto.setHora(sesion.getHoraInicio());
                 sesionDto.setEstado(sesion.getEstado().name());
                 sesionDtos.add(sesionDto);
             }

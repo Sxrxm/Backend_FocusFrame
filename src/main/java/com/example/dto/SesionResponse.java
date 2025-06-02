@@ -8,42 +8,25 @@ import java.time.LocalTime;
 public class SesionResponse {
     private Long id;
     private String nombre;
-    private String nombreP;
-    private String nombreF;
-    private Long idFuncionario;
-    private Long idPaciente;
+    private String nombreFuncionario;
+    private String nombrePaciente;
     private LocalDate fechaSesion;
-    private LocalTime hora;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
     private Sesion.EstadoSesion estado;
+    private String notasAdicionales;
 
 
-
-    public SesionResponse(Long id, String nombre, String nombreP, String nombreF, Long idFuncionario, Long idPaciente, LocalDate fechaSesion, LocalTime hora, Sesion.EstadoSesion estado) {
+    public SesionResponse(Long id, String nombre, String nombreFuncionario, String nombrePaciente, LocalDate fechaSesion, LocalTime horaInicio, LocalTime horaFin, Sesion.EstadoSesion estado, String notasAdicionales) {
         this.id = id;
         this.nombre = nombre;
-        this.nombreP = nombreP;
-        this.nombreF = nombreF;
-        this.idFuncionario = idFuncionario;
-        this.idPaciente = idPaciente;
+        this.nombreFuncionario = nombreFuncionario;
+        this.nombrePaciente = nombrePaciente;
         this.fechaSesion = fechaSesion;
-        this.hora = hora;
+        this.horaInicio = horaInicio;
+        this.horaFin = horaFin;
         this.estado = estado;
-    }
-
-    public String getNombreP() {
-        return nombreP;
-    }
-
-    public void setNombreP(String nombreP) {
-        this.nombreP = nombreP;
-    }
-
-    public String getNombreF() {
-        return nombreF;
-    }
-
-    public void setNombreF(String nombreF) {
-        this.nombreF = nombreF;
+        this.notasAdicionales = notasAdicionales;
     }
 
     public Long getId() {
@@ -62,20 +45,20 @@ public class SesionResponse {
         this.nombre = nombre;
     }
 
-    public Long getIdFuncionario() {
-        return idFuncionario;
+    public String getNombreFuncionario() {
+        return nombreFuncionario;
     }
 
-    public void setIdFuncionario(Long idFuncionario) {
-        this.idFuncionario = idFuncionario;
+    public void setNombreFuncionario(String nombreFuncionario) {
+        this.nombreFuncionario = nombreFuncionario;
     }
 
-    public Long getIdPaciente() {
-        return idPaciente;
+    public String getNombrePaciente() {
+        return nombrePaciente;
     }
 
-    public void setIdPaciente(Long idPaciente) {
-        this.idPaciente = idPaciente;
+    public void setNombrePaciente(String nombrePaciente) {
+        this.nombrePaciente = nombrePaciente;
     }
 
     public LocalDate getFechaSesion() {
@@ -86,14 +69,21 @@ public class SesionResponse {
         this.fechaSesion = fechaSesion;
     }
 
-    public LocalTime getHora() {
-        return hora;
+    public LocalTime getHoraInicio() {
+        return horaInicio;
     }
 
-    public void setHora(LocalTime hora) {
-        this.hora = hora;
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
     }
 
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
+    }
 
     public Sesion.EstadoSesion getEstado() {
         return estado;
@@ -101,5 +91,13 @@ public class SesionResponse {
 
     public void setEstado(Sesion.EstadoSesion estado) {
         this.estado = estado;
+    }
+
+    public String getNotasAdicionales() {
+        return notasAdicionales;
+    }
+
+    public void setNotasAdicionales(String notasAdicionales) {
+        this.notasAdicionales = notasAdicionales;
     }
 }

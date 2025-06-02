@@ -13,7 +13,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
 import java.util.Set;
 
 @Service
@@ -69,7 +68,7 @@ public class TerapiaService {
         terapia.setFuncionario(funcionario);
         terapia.setPaciente(paciente);
         terapia.setHistorialClinico(historialClinico);
-        terapia.setTipoTerapia(terapia.getTipoTerapia());
+        terapia.setNumeroSesiones(request.getNumeroSesiones());
 
         terapia = terapiaRepository.save(terapia);
 

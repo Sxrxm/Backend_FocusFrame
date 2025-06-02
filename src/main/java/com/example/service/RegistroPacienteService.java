@@ -6,6 +6,7 @@ import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.PacienteRepository;
 import com.example.repository.UserRepository;
+import com.example.security.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -30,25 +31,25 @@ public class RegistroPacienteService {
         this.messageSource = messageSource;
     }
 
-    public void validateRequest(RegistroPacienteRequest request, Locale locale) {
+    public void validateRequest(RegistroPacienteRequest request) {
         if (userRepository.findByEmail(request.getEmail()) != null) {
-            throw new IllegalArgumentException(messageSource.getMessage("email.use", null, locale));
+            throw new BadRequestException("email.use");
         }
 
         if (pacienteRepository.findByDocumento(request.getDocumento()) != null) {
-            throw new IllegalArgumentException(messageSource.getMessage("doc.register", null, locale));
+            throw new BadRequestException("doc.register");
         }
 
         String telefono = String.valueOf(request.getTelefono());
         String documento = String.valueOf(request.getDocumento());
 
         if (telefono == null || !telefono.matches("\\d{10}")) {
-            throw new RuntimeException(messageSource.getMessage("phone.length.invalid", null, locale));
+            throw new BadRequestException("phone.length.invalid");
         }
 
 
         if (documento == null || !documento.matches("\\d{6,11}")) {
-            throw new RuntimeException(messageSource.getMessage("doc.length.invalid", null, locale));
+            throw new BadRequestException("doc.length.invalid");
         }
     }
 
@@ -81,8 +82,8 @@ public class RegistroPacienteService {
     }
 
     @Transactional
-    public Paciente registrarPaciente(RegistroPacienteRequest request, Locale locale) {
-        validateRequest(request, locale);
+    public Paciente registrarPaciente(RegistroPacienteRequest request) {
+        validateRequest(request);
 
         User usuario = createUser(request);
         Paciente paciente = crearPaciente(request, usuario);

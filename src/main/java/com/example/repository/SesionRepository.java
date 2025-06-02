@@ -16,12 +16,12 @@ import java.util.List;
 @Repository
 public interface SesionRepository extends JpaRepository<Sesion, Long> {
 
-    List<Sesion> findByFuncionarioAndFechaSesionAndHora(Funcionario funcionario, LocalDate fechaSesion, LocalTime hora);
 
     List<Sesion> findByEstado(String estado);
 
     List<Sesion> findByFuncionarioAndFechaSesion(Funcionario funcionario,LocalDate fechaSesion);
 
-    int countByFuncionarioIdFuncionarioAndFechaSesionAndHora(Long funcionarioId, LocalDate fechaSesion, LocalTime hora);
+    List<Sesion> findByFuncionarioIdFuncionarioAndFechaSesion(Long idFuncionario, LocalDate fecha);
+
 
 }

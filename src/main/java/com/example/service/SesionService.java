@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +34,6 @@ import java.util.stream.IntStream;
 public class SesionService {
 
 
-    private final MessageSource messageSource;
     private final SesionRepository sesionRepository;
     private final FuncionarioRepository funcionarioRepository;
     private final TerapiaRepository terapiaRepository;
@@ -42,8 +41,7 @@ public class SesionService {
     private final SesionMapper sesionMapper;
 
     @Autowired
-    public SesionService(MessageSource messageSource, SesionRepository sesionRepository, FuncionarioRepository funcionarioRepository, TerapiaRepository terapiaRepository, PacienteRepository pacienteRepository, SesionMapper sesionMapper) {
-        this.messageSource = messageSource;
+    public SesionService( SesionRepository sesionRepository, FuncionarioRepository funcionarioRepository, TerapiaRepository terapiaRepository, PacienteRepository pacienteRepository, SesionMapper sesionMapper) {
         this.sesionRepository = sesionRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.terapiaRepository = terapiaRepository;
@@ -52,10 +50,10 @@ public class SesionService {
     }
 
     @Value("${app.horario.inicio:9}")
-    private int horaInicio;
+    private int horaInicioTrabajo;
 
     @Value("${app.horario.fin:18}")
-    private int horaFin;
+    private int horaFinTrabajo;
     public List<Sesion> getAllSesiones() {
         return sesionRepository.findAll();
     }
@@ -64,25 +62,45 @@ public class SesionService {
         return sesionRepository.findById(id);
     }
 
-    public boolean isHorarioDisponible(Long idFuncionario, LocalDate fecha, LocalTime hora) {
-        return sesionRepository.countByFuncionarioIdFuncionarioAndFechaSesionAndHora(idFuncionario, fecha, hora) == 0;
+    public boolean isHorarioDisponible(Long idFuncionario, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) {
+
+        List<Sesion> sesiones = sesionRepository.findByFuncionarioIdFuncionarioAndFechaSesion(idFuncionario, fecha);
+
+
+        for (Sesion sesion: sesiones) {
+            LocalTime inicio = sesion.getHoraInicio();
+            LocalTime fin = sesion.getHoraFin();
+
+            if (horaInicio.isBefore(fin) && horaFin.isAfter(inicio)){
+                return false;
+            }
+        }
+        return true;
     }
 
     public List<LocalTime> horasDiponiblesPSicologo(Long idFuncionario, LocalDate fecha) {
         Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
                 .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
-        List<LocalTime> horasTodas = IntStream.range(horaInicio, horaFin)
+        List<LocalTime> horasTotales = IntStream.range(horaInicioTrabajo, horaFinTrabajo)
                 .mapToObj(hora -> LocalTime.of(hora, 0)).collect(Collectors.toList());
 
-        Set<LocalTime> horasOcupadas = sesionRepository.findByFuncionarioAndFechaSesion(funcionario, fecha)
-                .stream()
-                .map(Sesion::getHora)
-                .collect(Collectors.toSet());
+        List<Sesion> sesionesDisponibles = sesionRepository.findByFuncionarioAndFechaSesion(funcionario, fecha);
 
-        return horasTodas.stream()
-                .filter(hora -> !horasOcupadas.contains(hora))
-                .collect(Collectors.toList());
+
+        List<LocalTime> horasDisponibles = new ArrayList<>();
+
+        for (LocalTime hora : horasTotales) {
+            LocalTime horaFinal = hora.plusHours(1);
+
+            boolean ocupado = sesionesDisponibles.stream()
+                    .anyMatch(sesion -> hora.isBefore(sesion.getHoraFin()) && horaFinal.isAfter(sesion.getHoraInicio()));
+
+        if (!ocupado) {
+            horasDisponibles.add(hora);
+        }
+        }
+        return horasDisponibles;
     }
 
     @Transactional
@@ -101,7 +119,8 @@ public class SesionService {
 
         if (!isHorarioDisponible(funcionario.getIdFuncionario(),
                 sesionRequest.getFechaSesion(),
-                sesionRequest.getHora())) {
+                sesionRequest.getHoraInicio(),
+                sesionRequest.getHoraFin())) {
             throw new BadRequestException("session.time.conflict");
         }
 
@@ -109,10 +128,8 @@ public class SesionService {
         sesion.setFuncionario(funcionario);
         sesion.setPaciente(paciente);
         sesion.setTerapia(terapia);
+        sesion.setNotasAdicionales(sesionRequest.getNotasAdicionales());
         sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
-
-        //String psicologoUsername = funcionario.getUser().getUsername();
-        String pacienteUsername = paciente.getUser().getUsername();
 
         sesion = sesionRepository.save(sesion);
 
@@ -134,7 +151,8 @@ public class SesionService {
 
         if (!isHorarioDisponible(request.getIdPsicologo(),
                 request.getFechaSesion(),
-                request.getHora())) {
+                request.getHoraInicio(),
+                request.getHoraFin())) {
             throw new BadRequestException("session.time.conflict");
         }
 
@@ -144,12 +162,12 @@ public class SesionService {
         sesion.setTerapia(terapia);
         sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
 
-
-
         sesion = sesionRepository.save(sesion);
 
         return sesionMapper.toResponse(sesion);
    }
+
+
 
    @Transactional
     public Sesion updateSesion(Long id, Sesion sesionDetails) {

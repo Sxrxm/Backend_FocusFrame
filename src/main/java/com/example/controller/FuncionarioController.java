@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.CardPaciente;
 import com.example.dto.FuncionarioPaso1Request;
 import com.example.dto.FuncionarioPaso1Response;
 import com.example.model.Funcionario;
@@ -12,7 +13,10 @@ import com.example.security.exception.BadRequestException;
 import com.example.security.exception.EntityNotFoundException;
 import com.example.security.jwt.JwtTokenManager;
 import com.example.service.FuncionarioService;
+import com.example.service.PacienteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +31,20 @@ import java.util.*;
 @RequestMapping("/funcionario")
 @CrossOrigin(origins = "http://localhost:5173")
 public class FuncionarioController {
-    @Autowired
-    private FuncionarioService funcionarioService;
-    private FuncionarioRepository funcionarioRepository;
-    private JwtTokenManager jwtTokenManager;
-    private PacienteRepository pacienteRepository;
+
+    private final FuncionarioService funcionarioService;
+    private final FuncionarioRepository funcionarioRepository;
+    private final JwtTokenManager jwtTokenManager;
+    private final PacienteRepository pacienteRepository;
+    private final PacienteService pacienteService;
+
+    public FuncionarioController(FuncionarioService funcionarioService, FuncionarioRepository funcionarioRepository, JwtTokenManager jwtTokenManager, PacienteRepository pacienteRepository, PacienteService pacienteService) {
+        this.funcionarioService = funcionarioService;
+        this.funcionarioRepository = funcionarioRepository;
+        this.jwtTokenManager = jwtTokenManager;
+        this.pacienteRepository = pacienteRepository;
+        this.pacienteService = pacienteService;
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener funcionario por ID", description = "Este endpoint permite obtener los detalles de un funcionario por su ID.")
@@ -66,23 +79,25 @@ public class FuncionarioController {
         }
     }
 
-    @GetMapping("/test-error")
-    public void testError() {
-        throw new EntityNotFoundException("funcionario.not.found");
-    }
 
 
+    @Operation(
+            summary = "Registrar usuario en paso 2",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),
+                    @ApiResponse(responseCode = "400", description = "Error de validación del usuario",
+                            content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Funcionario no encontrado",
+                            content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+            }
+    )
     @PostMapping("/paso2/{idFuncionario}")
-    @Operation(summary = "Registrar usuario en paso 2")
     public ResponseEntity<Map<String, Object>> registroUsuario(
             @RequestBody RegistrationRequest registrationRequest,
             @PathVariable Long idFuncionario) {
 
-            Locale locale = LocaleContextHolder.getLocale();
-
-            Map<String, Object> response = funcionarioService.paso2(idFuncionario, registrationRequest, locale);
+            Map<String, Object> response = funcionarioService.paso2(idFuncionario, registrationRequest);
             return ResponseEntity.ok(response);
-
     }
 
     @PostMapping("/paso3/{idUsuario}")
@@ -97,6 +112,8 @@ public class FuncionarioController {
     }
 
 
+
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar funcionario", description = "Este endpoint permite eliminar a un funcionario dado su ID.")
     @ApiResponses(value = {
@@ -109,7 +126,14 @@ public class FuncionarioController {
 
     }
 
+
     @GetMapping("/pacientes")
+    public ResponseEntity<List<CardPaciente>> misPacientes() {
+        return ResponseEntity.ok(pacienteService.cardPacientes());
+    }
+
+
+    @GetMapping("/misPacientes")
     public List<Paciente> pacientes(@RequestHeader("Authorization") String authHeader){
         String token = authHeader.replace("Bearer", "");
         Long idPsicogologo = jwtTokenManager.getUserId(token);

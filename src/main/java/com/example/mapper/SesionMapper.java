@@ -17,6 +17,11 @@ public interface SesionMapper {
     @Mapping(target = "terapia", ignore = true)
     Sesion toEntity(SesionRequest request);
 
+    @Mapping(source = "funcionario.nombre", target = "nombreFuncionario")
+    @Mapping(source = "paciente.nombre", target = "nombrePaciente")
+    @Mapping(source = "sesion.horaInicio", target = "horaInicio")
+    @Mapping(source = "sesion.horaFin", target = "horaFin")
+    @Mapping(source = "sesion.notasAdicionales", target = "notasAdicionales")
     SesionResponse toResponse(Sesion sesion);
 }
 
