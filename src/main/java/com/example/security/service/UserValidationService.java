@@ -1,12 +1,10 @@
-package com.example.service;
+package com.example.security.service;
 
 import com.example.repository.UserRepository;
 import com.example.security.dto.RegistrationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-
 
 import java.util.Locale;
 import java.util.regex.Matcher;

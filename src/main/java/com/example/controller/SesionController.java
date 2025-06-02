@@ -1,10 +1,10 @@
 package com.example.controller;
 
 
+import com.example.dto.SesionRequest;
+import com.example.dto.SesionResponse;
 import com.example.model.Sesion;
 import com.example.repository.SesionRepository;
-import com.example.security.dto.SesionRequest;
-import com.example.security.dto.SesionResponse;
 import com.example.security.jwt.JwtAuthenticationFilter;
 import com.example.service.SesionService;
 import jakarta.persistence.EntityNotFoundException;
@@ -41,45 +41,30 @@ public class SesionController {
     }
 
     @GetMapping("horariosDisponibles/{idFuncionario}/{fecha}")
-    public ResponseEntity<List<LocalTime>> horasDisponibles(@PathVariable Long idFuncionario, @PathVariable LocalDate fecha, Locale locale) {
-        List<LocalTime> disponibles = sesionService.horasDiponiblesPSicologo(idFuncionario, fecha, locale );
+    public ResponseEntity<List<LocalTime>> horasDisponibles(@PathVariable Long idFuncionario, @PathVariable LocalDate fecha) {
+        List<LocalTime> disponibles = sesionService.horasDiponiblesPSicologo(idFuncionario, fecha);
         return ResponseEntity.ok(disponibles);
     }
 
     @PostMapping("/psicologo")
-    public ResponseEntity<?> registrarSesionComoPsicologo(@RequestBody SesionRequest request, Locale locale) {
-        try {
-            SesionResponse response = sesionService.registrarSesionPsicologo(request, locale);
+    public ResponseEntity<?> registrarSesionComoPsicologo(@RequestBody SesionRequest request) {
+            SesionResponse response = sesionService.registrarSesionPsicologo(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
-        }
     }
 
     @PostMapping("/paciente")
-    public ResponseEntity<?> agendarSesionComoPaciente(@RequestBody SesionRequest request, Locale locale) {
-        try {
-            SesionResponse response = sesionService.agendarCitaPaciente(request, locale);
+    public ResponseEntity<?> agendarSesionComoPaciente(@RequestBody SesionRequest request) {
+            SesionResponse response = sesionService.agendarCitaPaciente(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
-        }
     }
 
     @GetMapping("/horas-disponibles")
     public ResponseEntity<List<LocalTime>> consultarHorasDisponibles(
             @RequestParam Long idPsicologo,
-            @RequestParam String fecha,
-            Locale locale
+            @RequestParam String fecha
     ) {
         LocalDate localDate = LocalDate.parse(fecha);
-        List<LocalTime> horas = sesionService.horasDiponiblesPSicologo(idPsicologo, localDate, locale);
+        List<LocalTime> horas = sesionService.horasDiponiblesPSicologo(idPsicologo, localDate);
         return ResponseEntity.ok(horas);
     }
 

@@ -14,10 +14,10 @@ import lombok.Setter;
 public class LoginRequest {
 
 	@NotBlank(message = "{invalid.email}")
-	@Email(message = "{invalid.email}")
+	@Email(message = "{email.invalid}")
 	private String email;
 
-	@NotBlank(message = "La contraseña no puede estar vacía")
+	@NotBlank(message = "{password.not.null}")
 	private String password;
 
 	public String getEmail() {

@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,7 +44,7 @@ public class HistorialClinico {
     @Column(name = "ultima_actualizacion")
     private Date ultimaActualizacion;
 
-    @OneToMany(mappedBy = "historialClinico")
+    @OneToMany(mappedBy = "historialClinico", cascade = CascadeType.ALL)
     private Set<Terapia> terapias;
 
 
@@ -74,7 +73,7 @@ public class HistorialClinico {
     private String ocupacion;
 
 
-    @Column(length = 2000)
+    @Column(length = 2000, name = "observaciones_generales")
     private String observacionesGenerales;
 
     public enum Hobbies {
@@ -83,6 +82,7 @@ public class HistorialClinico {
         VIDEOJUEGOS,
         MUSICA,
         COCINA,
+        NINGUNO,
         OTRO
     }
 
@@ -102,6 +102,7 @@ public class HistorialClinico {
         Lisinopril,
         Sertralina,
         Diazepam,
+        Ninguna,
         Otro
     }
 

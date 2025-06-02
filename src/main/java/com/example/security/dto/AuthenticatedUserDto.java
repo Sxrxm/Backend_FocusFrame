@@ -1,6 +1,8 @@
 package com.example.security.dto;
 
 import com.example.model.UserRole;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,12 +1,13 @@
 package com.example.service;
 
+import com.example.dto.HistorialClinicoDto;
+import com.example.dto.HistorialClinicoResponse;
 import com.example.model.*;
 import com.example.repository.ContactoEmergenciaRepository;
 import com.example.repository.HistorialClinicoRepository;
 import com.example.repository.PacienteRepository;
-import com.example.security.dto.HistorialClinicoDto;
-import com.example.security.dto.HistorialClinicoResponse;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.security.exception.BadRequestException;
+import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -40,13 +41,13 @@ public class HistorialClinicoService {
 
 
     @Transactional
-    public HistorialClinico crearHistorial(Long pacienteId, HistorialClinicoDto historialClinicoDto, Locale locale) {
+    public HistorialClinico crearHistorial(Long pacienteId, HistorialClinicoDto historialClinicoDto) {
         Paciente paciente = pacienteRepository.findById(pacienteId)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
 
         if (historialClinicoRepository.existsByPaciente(paciente)) {
-            throw new EntityNotFoundException(messageSource.getMessage("medical.history.found", null, locale));
+            throw new EntityNotFoundException("medical.history.found");
         }
 
         HistorialClinico historialClinico = new HistorialClinico();
@@ -58,14 +59,14 @@ public class HistorialClinicoService {
         historialClinico.setHobbies(historialClinicoDto.getHobbies());
         if (historialClinicoDto.getHobbies() != null && historialClinicoDto.getHobbies().contains(HistorialClinico.Hobbies.OTRO)) {
             if (historialClinicoDto.getOtroHobbie() == null || historialClinicoDto.getOtroHobbie().trim().isEmpty()) {
-                throw new IllegalArgumentException(messageSource.getMessage("hobby.other.required", null, locale));
+                throw new BadRequestException("hobby.other.required");
             }
         }
         historialClinico.setOtroHobbie(historialClinicoDto.getOtroHobbie());
         historialClinico.setMedicamentos(historialClinicoDto.getMedicamentos());
         if (historialClinicoDto.getMedicamentos() != null && historialClinicoDto.getMedicamentos().contains(HistorialClinico.Medicamentos.Otro)) {
             if (historialClinicoDto.getOtroMedicamento() == null || historialClinicoDto.getOtroMedicamento().trim().isEmpty()) {
-                throw new IllegalArgumentException(messageSource.getMessage("medicine.other.required", null, locale));
+                throw new BadRequestException("medicine.other.required");
             }
         }
         historialClinico.setOtroMedicamento(historialClinicoDto.getOtroMedicamento());
@@ -73,7 +74,7 @@ public class HistorialClinicoService {
 
         if (historialClinicoDto.getEnfermedades() != null && historialClinicoDto.getEnfermedades().contains(HistorialClinico.Enfermedades.otro)){
             if (historialClinicoDto.getOtraEnfermedad() == null || historialClinicoDto.getOtraEnfermedad().trim().isEmpty()) {
-                throw new IllegalArgumentException(messageSource.getMessage("disease.other.required", null,locale));
+                throw new BadRequestException("disease.other.required");
             }
         }
         historialClinico.setOtraEnfermedad(historialClinicoDto.getOtraEnfermedad());
@@ -90,12 +91,12 @@ public class HistorialClinicoService {
     }
 
     @Transactional
-    public HistorialClinicoResponse getHistorialClinico(Long pacienteId, Locale locale) {
+    public HistorialClinicoResponse getHistorialClinico(Long pacienteId) {
         Paciente paciente = pacienteRepository.findById(pacienteId)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("user.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException("user.not.found"));
 
         HistorialClinico historialClinico = historialClinicoRepository.findByPacienteIdPaciente(paciente.getIdPaciente())
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medical.history.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException("medical.history.not.found"));
 
         return convertToDto(historialClinico, paciente);
     }
@@ -152,9 +153,9 @@ public class HistorialClinicoService {
 
 
     @Transactional
-    public HistorialClinico actualizarHistorialClinico(Long id, HistorialClinicoDto historialClinicoDto, Locale locale) {
+    public HistorialClinico actualizarHistorialClinico(Long id, HistorialClinicoDto historialClinicoDto) {
         HistorialClinico historialClinico = historialClinicoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medical.history.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException("medical.history.not.found"));
 
         historialClinico.setHobbies(historialClinicoDto.getHobbies());
         historialClinico.setMedicamentos(historialClinicoDto.getMedicamentos());

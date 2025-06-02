@@ -5,9 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 
 public class CambioContraRequest {
 
-
+    @NotBlank(message = "{password.not.null}")
     private String actual;
+
+    @NotBlank(message = "{password.not.null}")
     private String confirmar;
+
+    @NotBlank(message = "{password.not.null}")
     private String nueva;
 
     @NotBlank(message = "{invalid.email}")

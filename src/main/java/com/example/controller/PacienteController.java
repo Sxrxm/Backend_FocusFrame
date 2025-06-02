@@ -1,11 +1,13 @@
 package com.example.controller;
 
+import com.example.dto.CompletarPerfilPacienteRequest;
+import com.example.dto.RegistroPacienteRequest;
 import com.example.model.Paciente;
 import com.example.model.User;
 import com.example.repository.PacienteRepository;
 import com.example.repository.UserRepository;
-import com.example.security.dto.CompletarPerfilPacienteRequest;
-import com.example.security.dto.RegistroPacienteRequest;
+import com.example.security.exception.BadRequestException;
+import com.example.security.exception.EntityNotFoundException;
 import com.example.security.jwt.JwtAuthenticationFilter;
 import com.example.security.service.UserService;
 import com.example.service.PacienteService;
@@ -14,12 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -77,25 +80,22 @@ public class PacienteController {
     @PostMapping("/completar-perfil/{pacienteId}")
     public ResponseEntity<String> completarPerfil(
             @PathVariable Long pacienteId,
-            @RequestBody CompletarPerfilPacienteRequest request, Locale locale) {
+            @RequestBody CompletarPerfilPacienteRequest request,
+            Locale locale) {
 
-        Paciente paciente = pacienteRepository.findById(pacienteId).orElse(null);
-        if (paciente == null || !paciente.getIdPaciente().equals(pacienteId)) {
-            log.error("paciente no encontrado {}", pacienteId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente no encontrado");
-        }
+        Paciente paciente = pacienteRepository.findById(pacienteId)
+                .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
-        if (paciente.isPerfilCompletado()){
-            log.error("El perfil ya esta completado{}", pacienteId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El perfil ya está completado.");
+        if (paciente.isPerfilCompletado()) {
+            log.error("El perfil ya está completado {}", pacienteId);
+            throw new BadRequestException("perfil.ya.completado");
         }
 
         User usuario = userRepository.findByEmail(paciente.getEmail());
 
         if (usuario == null) {
-            String mensaje = messageSource.getMessage("user.not.found", null, locale);
-            log.error("usuario no encontrado con el email {}", paciente.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
+            log.error("Usuario no encontrado con el email {}", paciente.getEmail());
+            throw new EntityNotFoundException("user.not.found");
         }
 
         paciente.setEstado(true);
@@ -113,28 +113,23 @@ public class PacienteController {
 
 
     @PostMapping("/desactivar/{pacienteId}")
-    public ResponseEntity<Paciente> desactivarPaciente(@PathVariable Long pacienteId, Locale locale) {
-        try {
-            Paciente pacienteDessactivado = pacienteService.desactivarPaciente(pacienteId, locale);
+    public ResponseEntity<Paciente> desactivarPaciente(@PathVariable Long pacienteId) {
+            Paciente pacienteDessactivado = pacienteService.desactivarPaciente(pacienteId);
             return new ResponseEntity<>(pacienteDessactivado, HttpStatus.OK);
-        }catch (RuntimeException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id, Locale locale) {
-        try {
-            String mensaje = pacienteService.eliminarPaciente(id, locale);
+    public ResponseEntity<String> eliminarPaciente(@PathVariable Long id) {
+
+            String mensaje = pacienteService.eliminarPaciente(id );
             return ResponseEntity.ok(mensaje);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+
     }
 
+
     @GetMapping("/buscarPaciente")
-    public List<Paciente> filtrarNombre(@RequestParam String nombre, Pageable pageable) {
-        return pacienteService.buscarNombre(nombre, pageable);
+    public Page<Paciente> filtrarPorNombreEmail(@RequestParam String nombre,String email,  Pageable pageable) {
+        return pacienteService.buscarNombre(nombre, email,pageable);
     }
 
 
@@ -142,6 +137,7 @@ public class PacienteController {
     public List<Paciente> getAllPacientes() {
         return pacienteService.getAllPacientes();
     }
+
 
     @PutMapping("/actualizarPaciente")
     public ResponseEntity<Paciente> actualizarPaciente(@PathVariable Long id,@RequestBody Paciente paciente, Locale locale) {

@@ -1,10 +1,10 @@
 package com.example.controller;
 
 
+import com.example.dto.HistorialClinicoDto;
+import com.example.dto.HistorialClinicoResponse;
 import com.example.model.HistorialClinico;
 import com.example.repository.HistorialClinicoRepository;
-import com.example.security.dto.HistorialClinicoDto;
-import com.example.security.dto.HistorialClinicoResponse;
 import com.example.security.service.UserServiceImpl;
 import com.example.service.HistorialClinicoService;
 import org.springframework.http.HttpStatus;
@@ -31,25 +31,18 @@ public class HistorialClinicoController {
 
     @PostMapping("/crearHistorial/{idPaciente}")
     @PreAuthorize("hasRole('PSICOLOGO')")
-    public ResponseEntity<?> crearHistorial(@PathVariable Long idPaciente, @RequestBody HistorialClinicoDto request, Locale locale){
-        try {
-            HistorialClinico historial = historialClinicoService.crearHistorial(idPaciente, request, locale);
+    public ResponseEntity<?> crearHistorial(@PathVariable Long idPaciente, @RequestBody HistorialClinicoDto request){
+
+            HistorialClinico historial = historialClinicoService.crearHistorial(idPaciente, request);
             return ResponseEntity.status(HttpStatus.CREATED).body(historial);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
-        }
     }
 
     @GetMapping("/consultarHistorial/{pacienteId}")
-    public ResponseEntity<?> getHistorialClinico(@PathVariable Long pacienteId, Locale locale) {
-        try {
-            HistorialClinicoResponse response = historialClinicoService.getHistorialClinico(pacienteId, locale);
+    public ResponseEntity<?> getHistorialClinico(@PathVariable Long pacienteId) {
+
+            HistorialClinicoResponse response = historialClinicoService.getHistorialClinico(pacienteId);
             return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+
     }
 
     @PutMapping("/actualizarHistorial/{id}")

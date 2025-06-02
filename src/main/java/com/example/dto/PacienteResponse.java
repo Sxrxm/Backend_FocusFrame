@@ -1,4 +1,4 @@
-package com.example.security.dto;
+package com.example.dto;
 
 import com.example.model.Paciente;
 import com.example.model.TipoDoc;

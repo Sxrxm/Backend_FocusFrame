@@ -5,8 +5,9 @@ import com.example.model.UserRole;
 import com.example.repository.UserRepository;
 import com.example.security.dto.*;
 import com.example.security.service.AuthenticationService;
+import com.example.security.service.PasswordResetService;
 import com.example.security.service.UserService;
-import com.example.service.PasswordResetService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
         try {
             log.info("Intentando autenticar al usuario: {}", loginRequest.getEmail());
 
@@ -100,7 +101,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    ResponseEntity<RegistrationResponse> register(@RequestBody RegistrationRequest registrationRequest, Locale locale) {
+    ResponseEntity<RegistrationResponse> register(@RequestBody @Valid RegistrationRequest registrationRequest, Locale locale) {
         try {
             RegistrationResponse response = userService.registration(registrationRequest, locale);
             return ResponseEntity.ok(response);

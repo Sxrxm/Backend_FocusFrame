@@ -1,9 +1,8 @@
 package com.example.controller;
 
 
+import com.example.dto.TerapiaRequest;
 import com.example.model.Terapia;
-import com.example.security.dto.TerapiaRequest;
-import com.example.security.utils.GlobalExceptionHandler;
 import com.example.service.TerapiaService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,23 +31,13 @@ public class TerapiaController {
 
 
     @GetMapping("/Paciente/{idPaciente}/terapias")
-    public ResponseEntity<?> terapiasDelPaciente(@PathVariable Long idPaciente, Locale locale) {
-        try {
-            Set<Terapia> terapias = terapiaService.getTerapiasPaciente(idPaciente, locale);
+    public ResponseEntity<?> terapiasDelPaciente(@PathVariable Long idPaciente) {
+            Set<Terapia> terapias = terapiaService.getTerapiasPaciente(idPaciente);
             return ResponseEntity.ok(terapias);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
-        }
     }
     @PostMapping("/crear")
-    public ResponseEntity<?> crearTerapia(@RequestBody TerapiaRequest request, Locale locale) {
-        try {
-            Terapia terapia = terapiaService.crear(request, locale);
+    public ResponseEntity<?> crearTerapia(@RequestBody TerapiaRequest request) {
+            Terapia terapia = terapiaService.crear(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(terapia);
-        } catch (RuntimeException e) {
-            String errorMessage = e.getMessage();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
-        }
     }
 }

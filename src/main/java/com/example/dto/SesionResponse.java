@@ -1,8 +1,7 @@
-package com.example.security.dto;
+package com.example.dto;
 
 import com.example.model.Sesion;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

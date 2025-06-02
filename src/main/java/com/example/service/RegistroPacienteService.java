@@ -1,11 +1,11 @@
 package com.example.service;
 
+import com.example.dto.RegistroPacienteRequest;
 import com.example.model.Paciente;
 import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.PacienteRepository;
 import com.example.repository.UserRepository;
-import com.example.security.dto.RegistroPacienteRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -63,6 +63,8 @@ public class RegistroPacienteService {
     }
 
     private Paciente crearPaciente(RegistroPacienteRequest request, User usuario) {
+        usuario.setUserRole(UserRole.PACIENTE);
+
         Paciente paciente = new Paciente();
         paciente.setTelefono(request.getTelefono());
         paciente.setTipoDoc(request.getTipoDoc());
@@ -71,7 +73,6 @@ public class RegistroPacienteService {
         paciente.setEmail(request.getEmail());
         paciente.setNombre(request.getNombre());
         paciente.setApellido(request.getApellido());
-        paciente.setUserRole(UserRole.PACIENTE);
         paciente.setFechaCreacion(new Date());
         paciente.setUser(usuario);
         paciente.setEstado(false);

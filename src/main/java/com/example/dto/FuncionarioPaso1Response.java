@@ -1,8 +1,7 @@
-package com.example.security.dto;
+package com.example.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 public class FuncionarioPaso1Response {

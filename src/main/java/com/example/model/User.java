@@ -27,14 +27,14 @@ public class User {
     /*@Column(name = "nombre")
     private String name;*/
 
-    @Column(unique = true, name = "nombreUsusario", nullable = true)
+    @Column(unique = true, name = "nombre_usuario", nullable = true)
     private String username;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     @Email(message = "el correo electrónico debe ser válido")
     private String email;
 
-    @Column(name = "contraseña", nullable = true)
+    @Column(name = "contrasena", nullable = true)
     private String password;
 
     @Column(name = "fecha_creacion", updatable = false)
@@ -42,10 +42,10 @@ public class User {
     private Date fechaCreacion;
 
 
-    @Column(name = "tokenReset")
+    @Column(name = "token_reset")
     private String resetToken;
 
-    @Column(name = "expiraciónToken")
+    @Column(name = "expiracion_token")
     private LocalDateTime tokenExpiry;
 
     @Enumerated(EnumType.STRING)
@@ -53,7 +53,7 @@ public class User {
     private UserRole userRole;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipoDoc")
+    @Column(name = "tipo_documento")
     private TipoDoc tipoDoc;
 
     private LocalDate fechaNacimiento;

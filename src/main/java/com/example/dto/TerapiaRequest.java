@@ -1,4 +1,4 @@
-package com.example.security.dto;
+package com.example.dto;
 
 import com.example.model.Sesion;
 import com.example.model.Terapia;
@@ -6,7 +6,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 public class TerapiaRequest {

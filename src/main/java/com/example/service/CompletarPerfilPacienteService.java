@@ -1,13 +1,13 @@
 package com.example.service;
 
+import com.example.dto.CompletarPerfilPacienteRequest;
+import com.example.dto.PacienteResponse;
 import com.example.model.Paciente;
 import com.example.model.User;
 import com.example.repository.PacienteRepository;
-import com.example.security.dto.CompletarPerfilPacienteRequest;
-import com.example.security.dto.PacienteResponse;
+import com.example.security.exception.EntityNotFoundException;
 import com.example.security.jwt.JwtTokenManager;
 import com.example.security.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -39,10 +39,10 @@ public class CompletarPerfilPacienteService {
         User usuario = userService.findByEmail(email);
 
         if (usuario == null) {
-            throw new EntityNotFoundException(messageSource.getMessage("user.not.found", null,locale));
+            throw new EntityNotFoundException("user.not.found");
         }
 
-        Paciente paciente = pacienteRepository.findById(pacienteId).orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null,locale)));
+        Paciente paciente = pacienteRepository.findById(pacienteId).orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
         if (paciente.getUser() == null || !paciente.getUser().getId().equals(usuario.getId())) {
             throw new IllegalArgumentException("El paciente no tiene un usuario asociado o los datos no coinciden");

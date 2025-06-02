@@ -1,4 +1,4 @@
-package com.example.security.utils;
+package com.example.security.config;
 
 
 import org.springframework.context.MessageSource;
@@ -16,6 +16,7 @@ public class MessageSourceConfig {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setUseCodeAsDefaultMessage(true);
         return messageSource;
     }
 
@@ -25,7 +26,6 @@ public class MessageSourceConfig {
         bean.setValidationMessageSource(messageSource);
         return bean;
     }
-
 
 }
 

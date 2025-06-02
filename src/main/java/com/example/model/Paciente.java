@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -42,19 +43,23 @@ public class Paciente {
     private int documento;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipoDoc")
+    @Column(name = "tipo_documento")
     private TipoDoc tipoDoc;
 
     @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
-    private Boolean estado = true;
+    private Boolean estado ;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "id_usuario")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_funcionario")
+    private Funcionario funcionario;
 
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "paciente")
@@ -77,6 +82,10 @@ public class Paciente {
     @OneToOne(mappedBy = "paciente", fetch = FetchType.LAZY)
     @JsonIgnore
     private HistorialClinico historialClinico;
+
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Terapia> terapias;
 
 
 
@@ -220,11 +229,11 @@ public class Paciente {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public UserRole getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRole userRole) {
-        this.userRole = userRole;
-    }
+//    public UserRole getUserRole() {
+//        return userRole;
+//    }
+//
+//    public void setUserRole(UserRole userRole) {
+//        this.userRole = userRole;
+//    }
 }

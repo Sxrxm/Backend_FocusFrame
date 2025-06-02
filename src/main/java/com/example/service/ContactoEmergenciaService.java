@@ -1,8 +1,9 @@
 package com.example.service;
 
+import com.example.dto.HistorialClinicoDto;
 import com.example.model.ContactoEmergencia;
 import com.example.repository.ContactoEmergenciaRepository;
-import com.example.security.dto.HistorialClinicoDto;
+import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class ContactoEmergenciaService {
     @Transactional
     public ContactoEmergencia actualizarContactoEmergencia(Long id, HistorialClinicoDto.ContactoEmergenciaDto contactoEmergenciaDto) {
         ContactoEmergencia contactoEmergencia = contactoEmergenciaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contacto de emergencia no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("user.not.found"));
 
         contactoEmergencia.setNombre(contactoEmergenciaDto.getNombre());
         contactoEmergencia.setApellido(contactoEmergenciaDto.getApellido());

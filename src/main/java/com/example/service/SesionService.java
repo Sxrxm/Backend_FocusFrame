@@ -1,5 +1,8 @@
 package com.example.service;
 
+import com.example.dto.SesionRequest;
+import com.example.dto.SesionResponse;
+import com.example.mapper.SesionMapper;
 import com.example.model.Funcionario;
 import com.example.model.Paciente;
 import com.example.model.Sesion;
@@ -8,9 +11,8 @@ import com.example.repository.FuncionarioRepository;
 import com.example.repository.PacienteRepository;
 import com.example.repository.SesionRepository;
 import com.example.repository.TerapiaRepository;
-import com.example.security.dto.SesionRequest;
-import com.example.security.dto.SesionResponse;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.security.exception.BadRequestException;
+import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,14 +39,16 @@ public class SesionService {
     private final FuncionarioRepository funcionarioRepository;
     private final TerapiaRepository terapiaRepository;
     private final PacienteRepository pacienteRepository;
+    private final SesionMapper sesionMapper;
 
     @Autowired
-    public SesionService(MessageSource messageSource, SesionRepository sesionRepository, FuncionarioRepository funcionarioRepository, TerapiaRepository terapiaRepository, PacienteRepository pacienteRepository) {
+    public SesionService(MessageSource messageSource, SesionRepository sesionRepository, FuncionarioRepository funcionarioRepository, TerapiaRepository terapiaRepository, PacienteRepository pacienteRepository, SesionMapper sesionMapper) {
         this.messageSource = messageSource;
         this.sesionRepository = sesionRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.terapiaRepository = terapiaRepository;
         this.pacienteRepository = pacienteRepository;
+        this.sesionMapper = sesionMapper;
     }
 
     @Value("${app.horario.inicio:9}")
@@ -64,9 +68,9 @@ public class SesionService {
         return sesionRepository.countByFuncionarioIdFuncionarioAndFechaSesionAndHora(idFuncionario, fecha, hora) == 0;
     }
 
-    public List<LocalTime> horasDiponiblesPSicologo(Long idFuncionario, LocalDate fecha, Locale locale) {
+    public List<LocalTime> horasDiponiblesPSicologo(Long idFuncionario, LocalDate fecha) {
         Funcionario funcionario = funcionarioRepository.findById(idFuncionario)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("funcionario.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
         List<LocalTime> horasTodas = IntStream.range(horaInicio, horaFin)
                 .mapToObj(hora -> LocalTime.of(hora, 0)).collect(Collectors.toList());
@@ -82,102 +86,69 @@ public class SesionService {
     }
 
     @Transactional
-    public SesionResponse registrarSesionPsicologo(SesionRequest sesionRequest,  Locale locale) {
+    public SesionResponse registrarSesionPsicologo(SesionRequest sesionRequest) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("funcionario.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
 
         Paciente paciente = pacienteRepository.findById(sesionRequest.getIdPaciente())
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null,locale)));
+                .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
         Terapia terapia = terapiaRepository.findById(sesionRequest.getIdTerapia())
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("therapy.not.found",null,locale)));
+                .orElseThrow(() -> new EntityNotFoundException("therapy.not.found"));
 
         if (!isHorarioDisponible(funcionario.getIdFuncionario(),
                 sesionRequest.getFechaSesion(),
                 sesionRequest.getHora())) {
-            throw new RuntimeException(messageSource.getMessage("session.time.conflict", null, locale));
+            throw new BadRequestException("session.time.conflict");
         }
-        Sesion sesion = new Sesion();
 
-
+        Sesion sesion = sesionMapper.toEntity(sesionRequest);
         sesion.setFuncionario(funcionario);
-        sesion.setTerapia(terapia);
         sesion.setPaciente(paciente);
-        sesion.setNombre(sesionRequest.getNombre());
-        sesion.setFechaSesion(sesionRequest.getFechaSesion());
-        sesion.setHora(sesionRequest.getHora());
+        sesion.setTerapia(terapia);
         sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
-        sesion = sesionRepository.save(sesion);
-
 
         //String psicologoUsername = funcionario.getUser().getUsername();
         String pacienteUsername = paciente.getUser().getUsername();
 
+        sesion = sesionRepository.save(sesion);
 
-        return new SesionResponse(
-                sesion.getId(),
-                sesion.getNombre(),
-                paciente.getNombre(),
-                funcionario.getNombre(),
-                sesion.getFuncionario().getIdFuncionario(),
-                sesion.getPaciente().getIdPaciente(),
-                sesion.getFechaSesion(),
-                sesion.getHora(),
-                sesion.getEstado()
-        );
+        return sesionMapper.toResponse(sesion);
     }
 
     @Transactional
-    public SesionResponse agendarCitaPaciente(@RequestBody SesionRequest request, Locale locale) {
+    public SesionResponse agendarCitaPaciente(@RequestBody SesionRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Paciente paciente = pacienteRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null,locale)));
+                .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
         Funcionario funcionario = funcionarioRepository.findById(request.getIdPsicologo())
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("funcionario.not.found", null, locale)));
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
         Terapia terapia = terapiaRepository.findById(request.getIdTerapia())
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("therapy.not.found",null,locale)));
+                .orElseThrow(() -> new EntityNotFoundException("therapy.not.found"));
 
         if (!isHorarioDisponible(request.getIdPsicologo(),
                 request.getFechaSesion(),
                 request.getHora())) {
-            throw new RuntimeException(messageSource.getMessage("session.time.conflict", null, locale));
+            throw new BadRequestException("session.time.conflict");
         }
 
-
-        Sesion sesion = new Sesion();
-
+        Sesion sesion = sesionMapper.toEntity(request);
         sesion.setFuncionario(funcionario);
-        sesion.setTerapia(terapia);
         sesion.setPaciente(paciente);
-        sesion.setNombre(request.getNombre());
-        sesion.setFechaSesion(request.getFechaSesion());
-        sesion.setHora(request.getHora());
+        sesion.setTerapia(terapia);
         sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
+
+
+
         sesion = sesionRepository.save(sesion);
 
-        String psicologoUsername = funcionario.getUser().getUsername();
-
-        String pacienteUsername = paciente.getUser().getUsername();
-
-
-        return new SesionResponse(
-                sesion.getId(),
-                sesion.getNombre(),
-                pacienteUsername,
-                funcionario.getNombre(),
-                sesion.getFuncionario().getIdFuncionario(),
-                sesion.getPaciente().getIdPaciente(),
-                sesion.getFechaSesion(),
-                sesion.getHora(),
-                sesion.getEstado()
-        );
-
+        return sesionMapper.toResponse(sesion);
    }
 
    @Transactional

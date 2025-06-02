@@ -1,10 +1,10 @@
-package com.example.security.mapper;
+package com.example.mapper;
 
 
+import com.example.dto.HistorialClinicoDto;
+import com.example.dto.HistorialClinicoResponse;
 import com.example.model.HistorialClinico;
 import com.example.model.Paciente;
-import com.example.security.dto.HistorialClinicoDto;
-import com.example.security.dto.HistorialClinicoResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

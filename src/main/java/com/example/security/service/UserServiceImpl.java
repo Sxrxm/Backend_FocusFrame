@@ -8,10 +8,8 @@ import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
 import com.example.security.mapper.UserMapper;
 import com.example.security.utils.ValidarEdad;
-import com.example.service.UserValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

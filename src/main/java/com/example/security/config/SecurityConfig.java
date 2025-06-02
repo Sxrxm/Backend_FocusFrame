@@ -1,4 +1,4 @@
-package com.example.security;
+package com.example.security.config;
 
 import com.example.security.jwt.JwtAuthenticationFilter;
 import com.example.security.jwt.JwtTokenManager;
@@ -23,7 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
@@ -70,21 +69,16 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 "/v3/api-docs.yaml"
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()
-                        .requestMatchers("/auth/recuperarContra").permitAll()
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/recuperarContra", "funcionario/test-error").permitAll()
                         .requestMatchers("/auth/recuperar-contrasena").permitAll()
                         .requestMatchers("/auth/validate-reset-token").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/cambioContra").authenticated()
-                        .requestMatchers(HttpMethod.POST,"/funcionario/paso1").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/funcionario/paso2/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/funcionario/paso3/**").permitAll()
-                        .requestMatchers("/paciente/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}")
-                        .hasAnyAuthority("PSICOLOGO", "PACIENTE") // Unifica las rutas con roles
+                        .requestMatchers(HttpMethod.POST,"/funcionario/paso1", "/funcionario/paso2/**", "/funcionario/paso3/**").permitAll()
+                        .requestMatchers("/paciente/**").hasAuthority("PSICOLOGO")
+                        .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}").hasAnyAuthority("PSICOLOGO", "PACIENTE")
                         .requestMatchers(HttpMethod.POST,"/historialClinico/crearHistorial/{idPaciente}").hasAuthority("PSICOLOGO")
                         .requestMatchers(HttpMethod.POST, "/terapia/crear").hasAuthority("PSICOLOGO")
-                        .requestMatchers("/sesion/createSesion").hasAuthority("PSICOLOGO")
-                        .requestMatchers("/sesion/createSesion").hasRole("PACIENTE")
+                        .requestMatchers("/sesion/createSesion").hasAnyAuthority("PSICOLOGO", "PACIENTE")
                         .anyRequest().authenticated()
                 );
 

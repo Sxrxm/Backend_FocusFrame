@@ -22,13 +22,13 @@ public class Funcionario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "id_funcionario")
+    @Column(nullable = false, name = "idFuncionario")
     private Long idFuncionario;
 
-    @Column(name = "nombres")
+    @Column(name = "nombres", nullable = false)
     private String nombre;
 
-    @Column(name = "apellidos")
+    @Column(name = "apellidos", nullable = false)
     private String apellido;
 
     @Column(nullable = false, name = "documento")
@@ -52,6 +52,9 @@ public class Funcionario {
     @JoinColumn(name = "id_usuario")
     private User user;
 
+    @OneToMany(mappedBy = "funcionario", fetch = FetchType.LAZY)
+    private List<Paciente> pacientes;
+
     @Column(name = "fecha_creacion")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Bogota")
     @Temporal(TemporalType.TIMESTAMP)
@@ -66,6 +69,10 @@ public class Funcionario {
     @JsonIgnore
     private List<Terapia> terapia;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
+    @JsonIgnore
+    private List<NotaSesion> notaSesions;
+
     public List<Terapia> getTerapia() {
         return terapia;
     }
@@ -76,6 +83,14 @@ public class Funcionario {
 
     public int getDocumento() {
         return documento;
+    }
+
+    public List<NotaSesion> getNotaSesions() {
+        return notaSesions;
+    }
+
+    public void setNotaSesions(List<NotaSesion> notaSesions) {
+        this.notaSesions = notaSesions;
     }
 
     public void setDocumento(int documento) {

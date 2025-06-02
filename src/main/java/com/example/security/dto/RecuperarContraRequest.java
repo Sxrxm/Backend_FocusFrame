@@ -4,10 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 
 public class RecuperarContraRequest {
 
-    @NotBlank(message = "La nueva contraseña no puede estar vacía.")
+    @NotBlank(message = "{password.not.null}")
     private String nueva;
 
-    @NotBlank(message = "Debe confirmar la nueva contraseña.")
+    @NotBlank(message = "{password.not.null}")
     private String confirmar;
 
     public String getNueva() {

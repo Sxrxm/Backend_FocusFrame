@@ -1,19 +1,18 @@
 package com.example.service;
 
 
+import com.example.dto.TerapiaRequest;
 import com.example.model.*;
 import com.example.repository.FuncionarioRepository;
-import com.example.repository.HistorialClinicoRepository;
 import com.example.repository.PacienteRepository;
 import com.example.repository.TerapiaRepository;
-import com.example.security.dto.TerapiaRequest;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.security.exception.BadRequestException;
+import com.example.security.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -33,32 +32,32 @@ public class TerapiaService {
         this.pacienteRepository = pacienteRepository;
     }
 
-    public Set<Terapia> getTerapiasPaciente (Long idPaciente, Locale locale) {
+    public Set<Terapia> getTerapiasPaciente (Long idPaciente) {
         Paciente paciente =pacienteRepository.findById(idPaciente)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.not.found", null, locale )));
+                .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
         HistorialClinico historialClinico = paciente.getHistorialClinico();
         if (historialClinico == null) {
-            throw new EntityNotFoundException(messageSource.getMessage("history.not.found", null, locale));
+            throw new EntityNotFoundException("history.not.found");
         }
 
         return historialClinico.getTerapias();
     }
 
-   public Terapia crear (TerapiaRequest request, Locale locale) {
+   public Terapia crear (TerapiaRequest request) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
-                .orElseThrow(() -> new RuntimeException(messageSource.getMessage("funcionario.not.found : ", null,locale) + email));
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found : "));
 
         Paciente paciente = pacienteRepository.findById(request.getIdPaciente())
-                 .orElseThrow(() -> new RuntimeException(messageSource.getMessage("patient.not.found", null, locale)));
+                 .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
 
         HistorialClinico historialClinico = paciente.getHistorialClinico();
         if (historialClinico == null) {
-            throw new RuntimeException(messageSource.getMessage("medical.history.not.found",null, locale));
+            throw new BadRequestException("medical.history.not.found");
         }
 
 

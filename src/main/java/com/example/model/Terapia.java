@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,12 +23,23 @@ public class Terapia {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_funcionario")
     @JsonIgnore
     private Funcionario funcionario;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idPaciente")
     @JsonIgnore
     private Paciente paciente;
+
+    @OneToMany(mappedBy = "terapia", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Sesion> sesiones;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idHistorialClinico")
+    @JsonIgnore
+    private HistorialClinico historialClinico;
 
     @Column
     private String descripcion;
@@ -41,14 +50,6 @@ public class Terapia {
     @Column
     private LocalDate fechaFin;
 
-    @OneToMany(mappedBy = "terapia", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private Set<Sesion> sesiones;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idHistorialClinico")
-    @JsonIgnore
-    private HistorialClinico historialClinico;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Tipo_terapia")
