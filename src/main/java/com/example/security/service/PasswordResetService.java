@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,10 @@ public class PasswordResetService {
         user.setResetToken(token);
         user.setTokenExpiry(LocalDateTime.now().plusHours(24));
         userRepository.save(user);
+//        MimeMessageHelper helper = new MimeMessageHelper(, true);
+//        helper.setTo(email);
+//        helper.setSubject("Recuperación de contraseña");
+
 
 
         String linkCambio = "http://localhost:5173/auth/recuperar-contrasena?token=" + token;

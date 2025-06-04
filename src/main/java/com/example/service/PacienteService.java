@@ -61,13 +61,14 @@ public class PacienteService {
                 fechaHistorial = p.getHistorialClinico().getFechaCreacion();
 
                 return new CardPaciente(
-                        p.getNombre(),
+                        p.getNombre() + " " + p.getApellido(),
                         p.getEmail(),
                         p.getTelefono(),
                         p.getEstado(),
                         fechaHistorial,
                         0,
                         0,
+                        null,
                         0.0,
                         false
                 );
@@ -98,6 +99,7 @@ public class PacienteService {
                     fechaCreacionHistorial,
                     (int) completada,
                     total,
+                    t.getTipoTerapia().name(),
                     porcentajeTerapia,
                     citasPendientes
             );

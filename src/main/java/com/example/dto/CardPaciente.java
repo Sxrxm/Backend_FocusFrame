@@ -14,10 +14,12 @@ public class CardPaciente {
     private Date fechaCreacionHistorial;
     private int sesionesCompletadas;
     private int sesionesTotales;
+    private String nombreTerapia;
     private double porcentajeTerapia;
     private boolean tieneCitasPendientes;
 
-    public CardPaciente(String nombrePaciente, String email, Long telefono, boolean estado, Date fechaCreacionHistorial, int sesionesCompletadas, int sesionesTotales, double porcentajeTerapia, boolean tieneCitasPendientes) {
+
+    public CardPaciente(String nombrePaciente, String email, Long telefono, boolean estado, Date fechaCreacionHistorial, int sesionesCompletadas, int sesionesTotales, String nombreTerapia, double porcentajeTerapia, boolean tieneCitasPendientes) {
         this.nombrePaciente = nombrePaciente;
         this.email = email;
         this.telefono = telefono;
@@ -25,6 +27,7 @@ public class CardPaciente {
         this.fechaCreacionHistorial = fechaCreacionHistorial;
         this.sesionesCompletadas = sesionesCompletadas;
         this.sesionesTotales = sesionesTotales;
+        this.nombreTerapia = nombreTerapia;
         this.porcentajeTerapia = porcentajeTerapia;
         this.tieneCitasPendientes = tieneCitasPendientes;
     }
@@ -83,6 +86,14 @@ public class CardPaciente {
 
     public void setSesionesTotales(int sesionesTotales) {
         this.sesionesTotales = sesionesTotales;
+    }
+
+    public String getNombreTerapia() {
+        return nombreTerapia;
+    }
+
+    public void setNombreTerapia(String nombreTerapia) {
+        this.nombreTerapia = nombreTerapia;
     }
 
     public double getPorcentajeTerapia() {

@@ -6,6 +6,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,15 @@ public class EmailService {
 
     private User user;
 
+     @Transactional
+    public void enviarCorreoAgendamiento(String destinatario, String asunto, String cuerpo) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(destinatario);
+        mensaje.setSubject(asunto);
+        mensaje.setText(cuerpo);
+
+        mailSender.send(mensaje);
+    }
     @Transactional
     public void enviarCorreoConEnlace(String email, String enlace, User user, Paciente paciente) {
         if (email == null || email.isEmpty()) {

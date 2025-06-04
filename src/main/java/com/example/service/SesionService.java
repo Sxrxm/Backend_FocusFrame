@@ -39,14 +39,16 @@ public class SesionService {
     private final TerapiaRepository terapiaRepository;
     private final PacienteRepository pacienteRepository;
     private final SesionMapper sesionMapper;
+    private final EmailService emailService;
 
     @Autowired
-    public SesionService( SesionRepository sesionRepository, FuncionarioRepository funcionarioRepository, TerapiaRepository terapiaRepository, PacienteRepository pacienteRepository, SesionMapper sesionMapper) {
+    public SesionService(SesionRepository sesionRepository, FuncionarioRepository funcionarioRepository, TerapiaRepository terapiaRepository, PacienteRepository pacienteRepository, SesionMapper sesionMapper, EmailService emailService) {
         this.sesionRepository = sesionRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.terapiaRepository = terapiaRepository;
         this.pacienteRepository = pacienteRepository;
         this.sesionMapper = sesionMapper;
+        this.emailService = emailService;
     }
 
     @Value("${app.horario.inicio:9}")
@@ -132,6 +134,13 @@ public class SesionService {
         sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
 
         sesion = sesionRepository.save(sesion);
+
+        String asunto = "Nueva sesión agendada";
+        String cuerpo = "Hola " + sesion.getPaciente().getNombre() + " " + sesion.getPaciente().getApellido() +
+                ", tu sesión ha sido agendada para el " + sesion.getFechaSesion()+ " en el horario: " + sesion.getHoraInicio() + " " + sesion.getHoraFin() +
+                " , por el psicólogo " + sesion.getFuncionario().getNombre() + " " + sesion.getFuncionario().getApellido();
+
+        emailService.enviarCorreoAgendamiento(paciente.getEmail(), asunto, cuerpo);
 
         return sesionMapper.toResponse(sesion);
     }
