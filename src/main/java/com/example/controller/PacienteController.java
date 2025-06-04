@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.CardPaciente;
 import com.example.dto.CompletarPerfilPacienteRequest;
 import com.example.dto.RegistroPacienteRequest;
 import com.example.model.Paciente;

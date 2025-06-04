@@ -10,7 +10,7 @@ public class CardPaciente {
     private String email;
     private Long telefono;
     private boolean estado;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Bogota")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Bogota")
     private Date fechaCreacionHistorial;
     private int sesionesCompletadas;
     private int sesionesTotales;

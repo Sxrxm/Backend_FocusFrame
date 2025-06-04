@@ -1,15 +1,19 @@
 package com.example.service;
 
 import com.example.dto.RegistroPacienteRequest;
+import com.example.model.Funcionario;
 import com.example.model.Paciente;
 import com.example.model.User;
 import com.example.model.UserRole;
+import com.example.repository.FuncionarioRepository;
 import com.example.repository.PacienteRepository;
 import com.example.repository.UserRepository;
 import com.example.security.exception.BadRequestException;
+import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -21,14 +25,14 @@ public class RegistroPacienteService {
     private final UserRepository userRepository;
     private final PacienteRepository pacienteRepository;
     private final EmailService emailService;
-    private final MessageSource messageSource;
+    private final FuncionarioRepository funcionarioRepository;
 
     @Autowired
-    public RegistroPacienteService(UserRepository userRepository, PacienteRepository pacienteRepository, EmailService emailService, MessageSource messageSource) {
+    public RegistroPacienteService(UserRepository userRepository, PacienteRepository pacienteRepository, EmailService emailService, FuncionarioRepository funcionarioRepository) {
         this.userRepository = userRepository;
         this.pacienteRepository = pacienteRepository;
         this.emailService = emailService;
-        this.messageSource = messageSource;
+        this.funcionarioRepository = funcionarioRepository;
     }
 
     public void validateRequest(RegistroPacienteRequest request) {
@@ -64,7 +68,12 @@ public class RegistroPacienteService {
     }
 
     private Paciente crearPaciente(RegistroPacienteRequest request, User usuario) {
-        usuario.setUserRole(UserRole.PACIENTE);
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+
 
         Paciente paciente = new Paciente();
         paciente.setTelefono(request.getTelefono());
@@ -75,9 +84,10 @@ public class RegistroPacienteService {
         paciente.setNombre(request.getNombre());
         paciente.setApellido(request.getApellido());
         paciente.setFechaCreacion(new Date());
-        paciente.setUser(usuario);
+        paciente.setUserRole(usuario.getUserRole());
         paciente.setEstado(false);
         paciente.setPerfilCompletado(false);
+        paciente.setFuncionario(funcionario);
         return pacienteRepository.save(paciente);
     }
 

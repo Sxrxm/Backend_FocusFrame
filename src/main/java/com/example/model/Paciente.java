@@ -57,6 +57,8 @@ public class Paciente {
     @JoinColumn(name = "id_usuario")
     private User user;
 
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_funcionario")
     private Funcionario funcionario;
@@ -100,6 +102,30 @@ public class Paciente {
         return getEdad() < 18;
     }
 
+
+    public Set<Terapia> getTerapias() {
+        return terapias;
+    }
+
+    public void setTerapias(Set<Terapia> terapias) {
+        this.terapias = terapias;
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public void setFuncionario(Funcionario funcionario) {
+        this.funcionario = funcionario;
+    }
 
     public List<Terapia> getTerapia() {
         return terapia;

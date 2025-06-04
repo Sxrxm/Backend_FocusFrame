@@ -16,6 +16,9 @@ import java.util.List;
 @Repository
 public interface SesionRepository extends JpaRepository<Sesion, Long> {
 
+//    @Query("SELECT DISTINCT c.paciente FROM Sesion s WHERE s.funcionario.id = :funcionarioId")
+//    List<Paciente> findPacientesAgendadosConPsicologo(Long funcionarioId);
+
 
     List<Sesion> findByEstado(String estado);
 

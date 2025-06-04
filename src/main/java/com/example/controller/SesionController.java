@@ -60,10 +60,10 @@ public class SesionController {
             SesionResponse response = sesionService.registrarSesionPsicologo(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    @GetMapping("/buscarPacienteEnCita")
-    public List<Paciente> filtrarPorNombreEmail(@RequestParam String busqueda) {
-        return pacienteService.buscarNombre(busqueda);
-    }
+//    @GetMapping("/buscarPacienteEnCita")
+//    public List<Paciente> filtrarPorNombreEmail(@RequestParam String busqueda) {
+//        return pacienteService.buscarNombre(busqueda);
+//    }
 
     @PostMapping("/paciente")
     public ResponseEntity<?> agendarSesionComoPaciente(@RequestBody SesionRequest request) {

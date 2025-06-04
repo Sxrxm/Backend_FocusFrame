@@ -1,5 +1,6 @@
 package com.example.repository;
 
+import com.example.dto.CardPaciente;
 import com.example.model.Paciente;
 import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,6 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     Paciente findByDocumento(int documento);
     Optional<Paciente> findByEmail(String email);
     List<Paciente> findByFuncionario_IdFuncionario(long funcionarioId);
-
 
     @Query("SELECT p FROM Paciente p WHERE " +
             "LOWER(p.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +

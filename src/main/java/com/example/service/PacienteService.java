@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -39,42 +40,68 @@ public class PacienteService {
     }
 
     public List<Paciente> buscarNombre(String busqueda) {
+
         return pacienteRepository.buscarPacientes(busqueda);
     }
 
 
-    public List<Paciente> buscarNombreEnCita(String busqueda) {
-        return pacienteRepository.buscarPacientes(busqueda);
-    }
+//    public List<Paciente> buscarNombreEnCita(String busqueda) {
+//        return pacienteRepository.buscarPacientes(busqueda);
+//    }
 
     @Transactional
     public List<CardPaciente> cardPacientes() {
-        List<Terapia> terapias = terapiaRepository.findAll();
+        List<Paciente> pacientes = pacienteRepository.findAll();
 
-        return terapias.stream().map(t -> {
+        return pacientes.stream().map(p -> {
+            List<Terapia> terapias = p.getTerapia();
+            Date fechaHistorial;
+
+            if (terapias == null || terapias.isEmpty()) {
+                fechaHistorial = p.getHistorialClinico().getFechaCreacion();
+
+                return new CardPaciente(
+                        p.getNombre(),
+                        p.getEmail(),
+                        p.getTelefono(),
+                        p.getEstado(),
+                        fechaHistorial,
+                        0,
+                        0,
+                        0.0,
+                        false
+                );
+
+        }
+            Terapia t = terapias.get(terapias.size() - 1);
+
             int total = t.getNumeroSesiones();
-            long completada = t.getSesiones().stream().filter(s -> s.getEstado() == Sesion.EstadoSesion.FINALIZADA)
+            long completada = t.getSesiones().stream()
+                    .filter(s -> s.getEstado() == Sesion.EstadoSesion.FINALIZADA)
                     .count();
 
             boolean citasPendientes = t.getSesiones().stream()
-                    .anyMatch(s -> s.getEstado() == Sesion.EstadoSesion.PENDIENTE || s.getEstado() == Sesion.EstadoSesion.CONFIRMADA);
+                    .anyMatch(s -> s.getEstado() == Sesion.EstadoSesion.PENDIENTE
+                            || s.getEstado() == Sesion.EstadoSesion.CONFIRMADA);
 
-            Date fechaCreacionHistorial = t.getHistorialClinico() != null ? t.getHistorialClinico().getFechaCreacion() : null;
+            Date fechaCreacionHistorial = t.getHistorialClinico() != null
+                    ? t.getHistorialClinico().getFechaCreacion()
+                    : null;
 
             double porcentajeTerapia = total == 0 ? 0 : (completada * 100.0) / total;
 
-            Paciente paciente = t.getPaciente();
-
-            return new CardPaciente(paciente.getNombre(),
-                    paciente.getEmail(),
-                    paciente.getTelefono(),
-                    paciente.getEstado(),
+            return new CardPaciente(
+                    p.getNombre(),
+                    p.getEmail(),
+                    p.getTelefono(),
+                    p.getEstado(),
                     fechaCreacionHistorial,
                     (int) completada,
                     total,
                     porcentajeTerapia,
-                    citasPendientes);
-        } ).collect(Collectors.toList());
+                    citasPendientes
+            );
+        }).collect(Collectors.toList());
     }
 
     @Transactional

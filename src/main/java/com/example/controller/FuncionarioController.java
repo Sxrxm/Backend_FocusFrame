@@ -3,10 +3,12 @@ package com.example.controller;
 import com.example.dto.CardPaciente;
 import com.example.dto.FuncionarioPaso1Request;
 import com.example.dto.FuncionarioPaso1Response;
+import com.example.dto.PacienteResponse;
 import com.example.model.Funcionario;
 import com.example.model.Paciente;
 import com.example.repository.FuncionarioRepository;
 import com.example.repository.PacienteRepository;
+import com.example.repository.SesionRepository;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
 import com.example.security.exception.BadRequestException;
@@ -23,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -37,13 +41,15 @@ public class FuncionarioController {
     private final JwtTokenManager jwtTokenManager;
     private final PacienteRepository pacienteRepository;
     private final PacienteService pacienteService;
+    private final SesionRepository sesionRepository;
 
-    public FuncionarioController(FuncionarioService funcionarioService, FuncionarioRepository funcionarioRepository, JwtTokenManager jwtTokenManager, PacienteRepository pacienteRepository, PacienteService pacienteService) {
+    public FuncionarioController(FuncionarioService funcionarioService, FuncionarioRepository funcionarioRepository, JwtTokenManager jwtTokenManager, PacienteRepository pacienteRepository, PacienteService pacienteService, SesionRepository sesionRepository) {
         this.funcionarioService = funcionarioService;
         this.funcionarioRepository = funcionarioRepository;
         this.jwtTokenManager = jwtTokenManager;
         this.pacienteRepository = pacienteRepository;
         this.pacienteService = pacienteService;
+        this.sesionRepository = sesionRepository;
     }
 
     @GetMapping("/{id}")
@@ -133,10 +139,24 @@ public class FuncionarioController {
     }
 
 
-    @GetMapping("/misPacientes")
-    public List<Paciente> pacientes(@RequestHeader("Authorization") String authHeader){
-        String token = authHeader.replace("Bearer", "");
-        Long idPsicogologo = jwtTokenManager.getUserId(token);
-        return pacienteRepository.findByFuncionario_IdFuncionario(idPsicogologo);
-    }
+//    @GetMapping("/mis-pacientes")
+//    public ResponseEntity<List<CardPaciente>> obtenerMisPacientes() {
+//
+//        String email = SecurityContextHolder.getContext().getAuthentication();
+//        Funcionario psico = funcionarioRepository.findByUserEmail(email).orElseThrow(
+//                () -> new EntityNotFoundException("funcionario.not.found"));
+//
+//
+//        List<Paciente> registrado = pacienteRepository.findByFuncionario_IdFuncionario(psico.getIdFuncionario());
+//        List<Paciente> agendado = sesionRepository.findPacientesAgendadosConPsicologo(psico.getIdFuncionario());
+//
+//        Set<Paciente> todos = new HashSet<>();
+//        todos.addAll(registrado);
+//        todos.addAll(agendado);
+//
+//        return ResponseEntity.ok(todos.stream().map(mapper::toDTO).toList());
+//
+//
+//
+//    }
 }
