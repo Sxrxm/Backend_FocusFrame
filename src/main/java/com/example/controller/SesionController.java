@@ -81,15 +81,16 @@ public class SesionController {
         return ResponseEntity.ok(horas);
     }
 
-    @PutMapping("/updateSesion/{id}")
+    @PutMapping("/reagendarSesion/{id}")
     public Sesion updateSesion(@PathVariable Long id, @RequestBody Sesion sesionDetails) {
-        return sesionService.updateSesion(id, sesionDetails);
+        return sesionService.reagendarSesion(id, sesionDetails);
     }
 
 
-    @DeleteMapping("/deleteSesion/{id}")
+
+    @DeleteMapping("/cancelarSesion/{id}")
     public void deleteSesion(@PathVariable Long id) {
-        sesionService.deleteSesion(id);
+        sesionService.cancelarSesion(id);
     }
 
 

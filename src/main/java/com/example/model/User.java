@@ -24,8 +24,12 @@ public class User {
     @Column(name = "id_usuario")
     private Long id;
 
-    /*@Column(name = "nombre")
-    private String name;*/
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaDesactivacion;
+
+
+    @Column
+    private boolean estado = true;
 
     @Column(unique = true, name = "nombre_usuario", nullable = true)
     private String username;
@@ -85,6 +89,22 @@ public class User {
     @PrePersist
     public void asignarFechaCreacion() {
         this.fechaCreacion = new Date();
+    }
+
+    public Date getFechaDesactivacion() {
+        return fechaDesactivacion;
+    }
+
+    public void setFechaDesactivacion(Date fechaDesactivacion) {
+        this.fechaDesactivacion = fechaDesactivacion;
+    }
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
     }
 
     public Long getId() {

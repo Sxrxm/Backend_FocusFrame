@@ -1,11 +1,13 @@
 package com.example.security.service;
 
+import com.example.model.Paciente;
 import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.UserRepository;
 import com.example.security.dto.AuthenticatedUserDto;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
+import com.example.security.exception.EntityNotFoundException;
 import com.example.security.mapper.UserMapper;
 import com.example.security.utils.ValidarEdad;
 import org.slf4j.Logger;
@@ -13,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,6 +92,19 @@ public class UserServiceImpl implements UserService {
 		Matcher matcher = pattern.matcher(password);
 		return matcher.matches();
 	}
+
+    public User desactivarUsuario(Long idUsuario){
+        Optional<User> usuarioExistente = userRepository.findById(idUsuario);
+
+        if (usuarioExistente.isPresent()){
+            User usuario = usuarioExistente.get();
+            usuario.setEstado(false);
+            usuario.setFechaDesactivacion(new Date());
+            return userRepository.save(usuario);
+        } else {
+            throw new EntityNotFoundException("user.not.found");
+        }
+    }
 
 	@Override
 	public AuthenticatedUserDto findAuthenticatedUserByEmail(String email) {

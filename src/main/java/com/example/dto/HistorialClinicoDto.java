@@ -2,11 +2,16 @@ package com.example.dto;
 
 
 import com.example.model.HistorialClinico;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -26,6 +31,12 @@ public class HistorialClinicoDto {
     private String observacionesGenerales;
 
     private ContactoEmergenciaDto contactoEmergencia;
+
+
+    @Column(name = "fecha_creacion")
+    @JsonFormat(pattern = "yyyy-MM-dd ", timezone = "America/Bogota")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechacreacion;
 
 
     private List<TerapiaDto> terapias;
@@ -76,6 +87,14 @@ public class HistorialClinicoDto {
         public void setSesiones(List<SesionDto> sesiones) {
             this.sesiones = sesiones;
         }
+    }
+
+    public Date getFechacreacion() {
+        return fechacreacion;
+    }
+
+    public void setFechacreacion(Date fechacreacion) {
+        this.fechacreacion = fechacreacion;
     }
 
     public List<TerapiaDto> getTerapias() {

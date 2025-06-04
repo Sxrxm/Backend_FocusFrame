@@ -44,9 +44,6 @@ public class PasswordResetService {
         user.setResetToken(token);
         user.setTokenExpiry(LocalDateTime.now().plusHours(24));
         userRepository.save(user);
-//        MimeMessageHelper helper = new MimeMessageHelper(, true);
-//        helper.setTo(email);
-//        helper.setSubject("Recuperación de contraseña");
 
 
 
@@ -62,7 +59,9 @@ public class PasswordResetService {
                 "password.reset.email.subject",
                 null,
                 locale
-        );        correo.setText(mensaje);
+        );
+        correo.setSubject(subject);
+        correo.setText(mensaje);
         mailSender.send(correo);
     }
 

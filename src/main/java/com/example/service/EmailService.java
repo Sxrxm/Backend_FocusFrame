@@ -9,6 +9,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 
@@ -20,7 +21,7 @@ public class EmailService {
 
     private User user;
 
-     @Transactional
+        @Transactional
     public void enviarCorreoAgendamiento(String destinatario, String asunto, String cuerpo) {
         SimpleMailMessage mensaje = new SimpleMailMessage();
         mensaje.setTo(destinatario);
@@ -29,7 +30,9 @@ public class EmailService {
 
         mailSender.send(mensaje);
     }
-    @Transactional
+
+
+    @Async
     public void enviarCorreoConEnlace(String email, String enlace, User user, Paciente paciente) {
         if (email == null || email.isEmpty()) {
             System.err.println("Error: El correo electrónico es nulo o vacío.");

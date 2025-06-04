@@ -112,6 +112,7 @@ public class HistorialClinicoService {
         dto.setOtraEnfermedad(historialClinico.getOtraEnfermedad());
         dto.setOcupacion(historialClinico.getOcupacion());
         dto.setObservacionesGenerales(historialClinico.getObservacionesGenerales());
+        dto.setFechacreacion(historialClinico.getFechaCreacion());
 
         if (historialClinico.getContactoEmergencia() != null) {
             HistorialClinicoDto.ContactoEmergenciaDto contactoEmergenciaDto = new HistorialClinicoDto.ContactoEmergenciaDto();

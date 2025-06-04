@@ -173,22 +173,39 @@ public class SesionService {
 
         sesion = sesionRepository.save(sesion);
 
+        String asunto = "Nueva sesión agendada";
+        String cuerpo = "Hola " + sesion.getFuncionario().getNombre() + " " + sesion.getFuncionario().getApellido() +
+                ", tu sesión ha sido agendada para el " + sesion.getFechaSesion()+ " en el horario: " + sesion.getHoraInicio() + " " + sesion.getHoraFin() +
+                " , por el paciente " + sesion.getPaciente().getNombre() + " " + sesion.getPaciente().getApellido();
+
+        emailService.enviarCorreoAgendamiento(paciente.getEmail(), asunto, cuerpo);
+
+
         return sesionMapper.toResponse(sesion);
    }
 
 
 
    @Transactional
-    public Sesion updateSesion(Long id, Sesion sesionDetails) {
+    public Sesion reagendarSesion(Long id, Sesion sesionDetails) {
         return sesionRepository.findById(id).map(sesion -> {
             sesion.setFechaSesion(sesionDetails.getFechaSesion());
-            sesion.setEstado(sesionDetails.getEstado());
+            sesion.setHoraInicio(sesionDetails.getHoraInicio());
+            sesion.setHoraFin(sesionDetails.getHoraFin());
+            sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
             return sesionRepository.save(sesion);
-        }).orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+        }).orElseThrow(() -> new EntityNotFoundException("session.not.found"));
     }
 
-    public void deleteSesion(Long id) {
-        sesionRepository.deleteById(id);
+    @Transactional
+    public void cancelarSesion(Long id) {
+       Sesion sesion = sesionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("session.not.found"));
+
+        if (sesion.getEstado() == Sesion.EstadoSesion.CANCELADA) {
+            throw new BadRequestException("session.already.cancelled");
+        }
+
+        sesion.setEstado(Sesion.EstadoSesion.CANCELADA);
     }
 
     public List<Sesion> getSesionesByEstado(String estado) {
