@@ -61,6 +61,7 @@ public class PacienteService {
                 fechaHistorial = p.getHistorialClinico().getFechaCreacion();
 
                 return new CardPaciente(
+                        p.getIdPaciente(),
                         p.getNombre() + " " + p.getApellido(),
                         p.getEmail(),
                         p.getTelefono(),
@@ -92,6 +93,7 @@ public class PacienteService {
             double porcentajeTerapia = total == 0 ? 0 : (completada * 100.0) / total;
 
             return new CardPaciente(
+                    p.getIdPaciente(),
                     p.getNombre(),
                     p.getEmail(),
                     p.getTelefono(),

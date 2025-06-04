@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 public class CardPaciente {
+    private Long id;
     private String nombrePaciente;
     private String email;
     private Long telefono;
@@ -19,7 +20,8 @@ public class CardPaciente {
     private boolean tieneCitasPendientes;
 
 
-    public CardPaciente(String nombrePaciente, String email, Long telefono, boolean estado, Date fechaCreacionHistorial, int sesionesCompletadas, int sesionesTotales, String nombreTerapia, double porcentajeTerapia, boolean tieneCitasPendientes) {
+    public CardPaciente(Long id, String nombrePaciente, String email, Long telefono, boolean estado, Date fechaCreacionHistorial, int sesionesCompletadas, int sesionesTotales, String nombreTerapia, double porcentajeTerapia, boolean tieneCitasPendientes) {
+        this.id = id;
         this.nombrePaciente = nombrePaciente;
         this.email = email;
         this.telefono = telefono;
@@ -30,6 +32,14 @@ public class CardPaciente {
         this.nombreTerapia = nombreTerapia;
         this.porcentajeTerapia = porcentajeTerapia;
         this.tieneCitasPendientes = tieneCitasPendientes;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombrePaciente() {
