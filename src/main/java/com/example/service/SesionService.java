@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -148,7 +149,6 @@ public class SesionService {
     @Transactional
     public SesionResponse agendarCitaPaciente(@RequestBody SesionRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         Paciente paciente = pacienteRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
@@ -157,6 +157,16 @@ public class SesionService {
 
         Terapia terapia = terapiaRepository.findById(request.getIdTerapia())
                 .orElseThrow(() -> new EntityNotFoundException("therapy.not.found"));
+
+        if (request.getHoraFin().isBefore(request.getHoraInicio()) ||
+                request.getHoraFin().equals(request.getHoraInicio())) {
+            throw new BadRequestException("session.time.invalid.range");
+        }
+
+        Duration duracion = Duration.between(request.getHoraInicio(), request.getHoraFin());
+        if (duracion.toMinutes() < 60) {
+            throw new BadRequestException("session.time.too.short");
+        }
 
         if (!isHorarioDisponible(request.getIdPsicologo(),
                 request.getFechaSesion(),
