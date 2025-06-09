@@ -8,6 +8,7 @@ import com.example.repository.PacienteRepository;
 import com.example.repository.TerapiaRepository;
 import com.example.security.exception.BadRequestException;
 import com.example.security.exception.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,19 +32,22 @@ public class TerapiaService {
         this.pacienteRepository = pacienteRepository;
     }
 
+
+    @Transactional
     public Set<Terapia> getTerapiasPaciente (Long idPaciente) {
-        Paciente paciente =pacienteRepository.findById(idPaciente)
+        Paciente paciente = pacienteRepository.findById(idPaciente)
                 .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
         HistorialClinico historialClinico = paciente.getHistorialClinico();
         if (historialClinico == null) {
             throw new EntityNotFoundException("history.not.found");
         }
-
-        return historialClinico.getTerapias();
+         return historialClinico.getTerapias();
     }
 
-   public Terapia crear (TerapiaRequest request) {
+
+    @Transactional
+   public Terapia  crear (TerapiaRequest request) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -68,6 +72,7 @@ public class TerapiaService {
         terapia.setFuncionario(funcionario);
         terapia.setPaciente(paciente);
         terapia.setHistorialClinico(historialClinico);
+        terapia.setEstado(Terapia.EstadoTerapia.EN_PROGRESO);
         terapia.setNumeroSesiones(request.getNumeroSesiones());
 
         terapia = terapiaRepository.save(terapia);
@@ -81,4 +86,30 @@ public class TerapiaService {
         }
         return terapia;
     }
+
+
+    @Transactional
+    public void finalizar(Long idTerapia) {
+        Terapia terapia = terapiaRepository.findById(idTerapia).orElseThrow(() -> new EntityNotFoundException("therapy.not.found"));
+
+        terapia.setEstado(Terapia.EstadoTerapia.FINALIZADA);
+
+    }
+
+    @Transactional
+    public void cancelar(Long idTerapia) {
+
+        Terapia terapia = terapiaRepository.findById(idTerapia).orElseThrow(() -> new EntityNotFoundException("therapy.not.found"));
+
+
+        if (terapia.getEstado() == Terapia.EstadoTerapia.CANCELADA) {
+            throw new RuntimeException("terapia ya cancelada");
+        }
+        if (terapia.getEstado() == Terapia.EstadoTerapia.FINALIZADA) {
+            throw new RuntimeException("terapia ya finalizada, no se puede cancelar");
+        }
+
+        terapia.setEstado(Terapia.EstadoTerapia.CANCELADA);
+    }
+
 }

@@ -4,20 +4,31 @@ import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repository.UserRepository;
 import com.example.security.dto.*;
+import com.example.security.exception.EntityNotFoundException;
 import com.example.security.service.AuthenticationService;
 import com.example.security.service.PasswordResetService;
 import com.example.security.service.UserService;
+import com.example.security.service.UserServiceImpl;
+import jakarta.mail.Multipart;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -25,7 +36,7 @@ import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
@@ -34,6 +45,7 @@ public class AuthController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordResetService passwordResetService;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -42,11 +54,12 @@ public class AuthController {
     private MessageSource messageSource;
 
 
-    public AuthController(AuthenticationService authenticationService, UserService userService, UserRepository userRepository, PasswordResetService passwordResetService) {
+    public AuthController(AuthenticationService authenticationService, UserService userService, UserRepository userRepository, PasswordResetService passwordResetService, UserServiceImpl userServiceImpl) {
         this.authenticationService = authenticationService;
         this.userService = userService;
         this.userRepository = userRepository;
         this.passwordResetService = passwordResetService;
+        this.userServiceImpl = userServiceImpl;
     }
 
     private boolean isValidEmail(String email) {
@@ -165,6 +178,55 @@ public class AuthController {
         userRepository.save(usuario);
         return ResponseEntity.ok("Contraseña cambiada con exito.");
     }
+
+
+    @PatchMapping("/subirFoto/{id}")
+    public User subirFoto(@PathVariable Long id, MultipartFile foto) throws IOException {
+        return userServiceImpl.saveFotoPerfil(id, foto);
+    }
+
+
+    @GetMapping("/verFoto/{id}")
+    public ResponseEntity<UrlResource> verFoto(@PathVariable Long id) {
+        try {
+            // Obtener el archivo desde el servicio
+            File fotoPerfil = userServiceImpl.getFotoPerfil(id);
+
+            // Crear un recurso desde el archivo
+            Path path = fotoPerfil.toPath();
+            UrlResource resource = new UrlResource(path.toUri());
+
+            // Validar si el recurso es legible
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("No se pudo leer la imagen: " + fotoPerfil.getName());
+            }
+
+            // Determinar el tipo de contenido (por ejemplo, image/png)
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            // Construir y devolver la respuesta
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fotoPerfil.getName() + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+    }
+
+
+    @PatchMapping("/actualizarFoto/{id}")
+    public ResponseEntity<User> actualizarFoto(@PathVariable Long id, @RequestParam("nuevafoto") MultipartFile nuevafoto) throws IOException {
+        User userActualizado = userServiceImpl.updateFotoPerfil(id, nuevafoto);
+        return ResponseEntity.ok(userActualizado);
+    }
+
+
 
 
     @GetMapping("/validate-reset-token")

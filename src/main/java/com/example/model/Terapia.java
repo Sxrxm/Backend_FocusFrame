@@ -32,6 +32,7 @@ public class Terapia {
     @JsonIgnore
     private Paciente paciente;
 
+
     @OneToMany(mappedBy = "terapia", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<Sesion> sesiones;
@@ -56,6 +57,17 @@ public class Terapia {
 
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
+    private EstadoTerapia estado;
+
+
+    public enum EstadoTerapia {
+        EN_PROGRESO, CANCELADA, FINALIZADA
+    }
+
+
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "Tipo_terapia")
     private TipoTerapia TipoTerapia;
 
@@ -67,6 +79,13 @@ public class Terapia {
         infantil
     }
 
+    public EstadoTerapia getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoTerapia estado) {
+        this.estado = estado;
+    }
 
     public int getNumeroSesiones() {
         return numeroSesiones;

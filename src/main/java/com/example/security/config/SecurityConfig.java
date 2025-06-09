@@ -69,9 +69,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 "/v3/api-docs.yaml"
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/register", "/auth/login", "/auth/recuperarContra", "funcionario/test-error").permitAll()
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/recuperarContra", "/auth/subirFoto/**","/auth/verFoto/**", "/auth/actualizarFoto/**" ).permitAll()
                         .requestMatchers("/auth/recuperar-contrasena").permitAll()
                         .requestMatchers("/auth/validate-reset-token").permitAll()
+                        .requestMatchers("/paciente/completar-perfil/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/cambioContra").authenticated()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso1", "/funcionario/paso2/**", "/funcionario/paso3/**").permitAll()
                         .requestMatchers("/paciente/**").hasAuthority("PSICOLOGO")
@@ -79,6 +80,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}").hasAnyAuthority("PSICOLOGO", "PACIENTE")
                         .requestMatchers(HttpMethod.POST,"/historialClinico/crearHistorial/{idPaciente}").hasAuthority("PSICOLOGO")
                         .requestMatchers(HttpMethod.POST, "/terapia/crear").hasAuthority("PSICOLOGO")
+                        .requestMatchers(HttpMethod.GET, "/terapia/**").hasAnyAuthority("PSICOLOGO", "PACIENTE")
                         .requestMatchers("/sesion/**").hasAnyAuthority("PSICOLOGO", "PACIENTE")
                         .anyRequest().authenticated()
                 );

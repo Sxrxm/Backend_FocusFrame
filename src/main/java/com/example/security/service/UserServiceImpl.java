@@ -14,7 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
@@ -37,13 +40,15 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final UserValidationService userValidationService;
+    private final FileStorageService fileStorageService;
 
 
 
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserValidationService userValidationService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserValidationService userValidationService, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userValidationService = userValidationService;
+        this.fileStorageService = fileStorageService;
     }
 
 
@@ -92,6 +97,39 @@ public class UserServiceImpl implements UserService {
 		Matcher matcher = pattern.matcher(password);
 		return matcher.matches();
 	}
+
+    public User saveFotoPerfil(Long id, MultipartFile file) throws IOException {
+        User usuario = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+
+
+        String fileName = fileStorageService.saveFile(file);
+        usuario.setFotoPerfil(fileName);
+        return userRepository.save(usuario);
+    }
+
+
+    public User updateFotoPerfil(Long id, MultipartFile file) throws IOException {
+        User usuario = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+
+        System.out.println("validando user");
+        String fotoAntigua = usuario.getFotoPerfil();
+        System.out.println("recibiendo foto");
+        String fotoNueva = fileStorageService.updateFile(file, fotoAntigua);
+        System.out.println("se recibe");
+
+        usuario.setFotoPerfil(fotoNueva);
+        System.out.println("se actualiza");
+        return userRepository.save(usuario);
+    }
+
+    public File getFotoPerfil(Long id) {
+        User usuario = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+
+        return fileStorageService.getFile(usuario.getFotoPerfil());
+    }
 
     public User desactivarUsuario(Long idUsuario){
         Optional<User> usuarioExistente = userRepository.findById(idUsuario);

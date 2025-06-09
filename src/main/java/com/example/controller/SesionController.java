@@ -87,10 +87,16 @@ public class SesionController {
     }
 
 
+    @PutMapping("/finalizarSesion/{idSesion}")
+    public ResponseEntity<String> finalizarSesion(@PathVariable Long idSesion){
+         sesionService.finalizarSesion(idSesion);
+        return ResponseEntity.ok("Sesion finalizada.");
+    }
 
     @DeleteMapping("/cancelarSesion/{id}")
-    public void deleteSesion(@PathVariable Long id) {
+    public ResponseEntity<String> cancelarSesion(@PathVariable Long id) {
         sesionService.cancelarSesion(id);
+        return ResponseEntity.ok("Sesion cancelada.");
     }
 
 

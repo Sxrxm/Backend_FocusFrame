@@ -30,14 +30,30 @@ public class TerapiaController {
     }
 
 
-    @GetMapping("/Paciente/{idPaciente}/terapias")
+    @GetMapping("/{idPaciente}")
     public ResponseEntity<?> terapiasDelPaciente(@PathVariable Long idPaciente) {
-            Set<Terapia> terapias = terapiaService.getTerapiasPaciente(idPaciente);
-            return ResponseEntity.ok(terapias);
+        Set<Terapia> terapias = terapiaService.getTerapiasPaciente(idPaciente);
+        return ResponseEntity.ok(terapias);
     }
+
     @PostMapping("/crear")
     public ResponseEntity<?> crearTerapia(@RequestBody TerapiaRequest request) {
-            Terapia terapia = terapiaService.crear(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(terapia);
+        Terapia terapia = terapiaService.crear(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(terapia);
+    }
+
+
+    @PutMapping("/finalizar/{idTerapia}")
+    public ResponseEntity<String> finalizarTerapia(@PathVariable Long idTerapia){
+        terapiaService.finalizar(idTerapia);
+        return ResponseEntity.ok("Sesión cancelada con éxito");
+    }
+
+
+    @DeleteMapping("/cancelar/{id}")
+    public ResponseEntity<String> cancelarTerapia(@PathVariable Long idTerapia){
+        terapiaService.cancelar(idTerapia);
+        return ResponseEntity.ok("Terapia cancelada.");
+
     }
 }

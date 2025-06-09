@@ -67,8 +67,10 @@ public class SesionService {
 
     public boolean isHorarioDisponible(Long idFuncionario, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) {
 
-        List<Sesion> sesiones = sesionRepository.findByFuncionarioIdFuncionarioAndFechaSesion(idFuncionario, fecha);
-
+        List<Sesion> sesiones = sesionRepository.findByFuncionarioIdFuncionarioAndFechaSesion(idFuncionario, fecha)
+                .stream()
+                .filter(s -> s.getEstado() != Sesion.EstadoSesion.CANCELADA)
+                .collect(Collectors.toList());
 
         for (Sesion sesion: sesiones) {
             LocalTime inicio = sesion.getHoraInicio();
@@ -88,7 +90,10 @@ public class SesionService {
         List<LocalTime> horasTotales = IntStream.range(horaInicioTrabajo, horaFinTrabajo)
                 .mapToObj(hora -> LocalTime.of(hora, 0)).collect(Collectors.toList());
 
-        List<Sesion> sesionesDisponibles = sesionRepository.findByFuncionarioAndFechaSesion(funcionario, fecha);
+        List<Sesion> sesionesDisponibles = sesionRepository.findByFuncionarioAndFechaSesion(funcionario, fecha)
+                .stream()
+                .filter(s -> s.getEstado() != Sesion.EstadoSesion.CANCELADA)
+                .collect(Collectors.toList());
 
 
         List<LocalTime> horasDisponibles = new ArrayList<>();
@@ -180,6 +185,7 @@ public class SesionService {
         sesion.setPaciente(paciente);
         sesion.setTerapia(terapia);
         sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
+        terapia.setEstado(Terapia.EstadoTerapia.EN_PROGRESO);
 
         sesion = sesionRepository.save(sesion);
 
@@ -205,6 +211,15 @@ public class SesionService {
             sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
             return sesionRepository.save(sesion);
         }).orElseThrow(() -> new EntityNotFoundException("session.not.found"));
+    }
+
+
+
+    @Transactional
+    public void finalizarSesion(Long idSesion){
+        Sesion sesion = sesionRepository.findById(idSesion).orElseThrow(() -> new EntityNotFoundException("session.not.found"));
+
+        sesion.setEstado(Sesion.EstadoSesion.FINALIZADA);
     }
 
     @Transactional

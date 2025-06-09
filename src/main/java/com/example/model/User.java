@@ -38,6 +38,8 @@ public class User {
     @Email(message = "el correo electrónico debe ser válido")
     private String email;
 
+
+    @JsonIgnore
     @Column(name = "contrasena", nullable = true)
     private String password;
 
@@ -45,6 +47,8 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
 
+    @Column(name = "foto", nullable = true)
+    private String fotoPerfil;
 
     @Column(name = "token_reset")
     private String resetToken;
@@ -68,6 +72,14 @@ public class User {
         return Period.between(fechaNacimiento, LocalDate.now()).getYears() < 18;
     }
 
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
 
     public LocalDate getFechaNacimiento() {
         return fechaNacimiento;

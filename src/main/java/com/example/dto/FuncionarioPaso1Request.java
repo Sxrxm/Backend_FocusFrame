@@ -1,7 +1,10 @@
 package com.example.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
+
+@Data
 public class FuncionarioPaso1Request {
 
     @NotBlank(message = "Los nombres no pueden estar vacíos")

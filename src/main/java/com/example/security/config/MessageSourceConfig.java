@@ -20,12 +20,6 @@ public class MessageSourceConfig {
         return messageSource;
     }
 
-    @Bean
-    public LocalValidatorFactoryBean validator(MessageSource messageSource) {
-        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setValidationMessageSource(messageSource);
-        return bean;
-    }
 
 }
 
