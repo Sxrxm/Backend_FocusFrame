@@ -126,12 +126,10 @@ public class PacienteController {
 
 
     @GetMapping("/buscarPaciente")
-    public List<Paciente> filtrarPorNombreEmail(@RequestParam String busqueda) {
-        return pacienteService.buscarNombre(busqueda);
+    public ResponseEntity<List<CardPaciente>> buscarCardPacientes(@RequestParam String busqueda) {
+        List<CardPaciente> resultado = pacienteService.buscarPaciente(busqueda);
+        return ResponseEntity.ok(resultado);
     }
-
-
-
 
 
     @PutMapping("/actualizarPaciente")

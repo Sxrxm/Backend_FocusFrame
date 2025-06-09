@@ -35,30 +35,18 @@ public class PacienteService {
     }
 
 
-    public Paciente buscarPacientePorId(Long id) {
-        return pacienteRepository.findById(id).get();
-    }
+    public List<CardPaciente> buscarPaciente(String busqueda) {
 
-    public List<Paciente> buscarNombre(String busqueda) {
-
-        return pacienteRepository.buscarPacientes(busqueda);
-    }
-
-
-//    public List<Paciente> buscarNombreEnCita(String busqueda) {
-//        return pacienteRepository.buscarPacientes(busqueda);
-//    }
-
-    @Transactional
-    public List<CardPaciente> cardPacientes() {
-        List<Paciente> pacientes = pacienteRepository.findAll();
+        List<Paciente> pacientes = pacienteRepository.buscarPacientes(busqueda);
 
         return pacientes.stream().map(p -> {
             List<Terapia> terapias = p.getTerapia();
-            Date fechaHistorial;
+            Date fechaHistorial = null;
 
             if (terapias == null || terapias.isEmpty()) {
-                fechaHistorial = p.getHistorialClinico().getFechaCreacion();
+                if (p.getHistorialClinico() != null) {
+                    fechaHistorial = p.getHistorialClinico().getFechaCreacion();
+                }
 
                 return new CardPaciente(
                         p.getIdPaciente(),
@@ -73,8 +61,8 @@ public class PacienteService {
                         0.0,
                         false
                 );
+            }
 
-        }
             Terapia t = terapias.get(terapias.size() - 1);
 
             int total = t.getNumeroSesiones();
@@ -86,27 +74,96 @@ public class PacienteService {
                     .anyMatch(s -> s.getEstado() == Sesion.EstadoSesion.PENDIENTE
                             || s.getEstado() == Sesion.EstadoSesion.CONFIRMADA);
 
-            Date fechaCreacionHistorial = t.getHistorialClinico() != null
-                    ? t.getHistorialClinico().getFechaCreacion()
-                    : null;
+            Date fechaCreacionHistorial = null;
+            if (t.getHistorialClinico() != null) {
+                fechaCreacionHistorial = t.getHistorialClinico().getFechaCreacion();
+            }
 
             double porcentajeTerapia = total == 0 ? 0 : (completada * 100.0) / total;
 
             return new CardPaciente(
                     p.getIdPaciente(),
-                    p.getNombre(),
+                    p.getNombre() + " " + p.getApellido(),
                     p.getEmail(),
                     p.getTelefono(),
                     p.getEstado(),
                     fechaCreacionHistorial,
                     (int) completada,
                     total,
-                    t.getTipoTerapia().name(),
+                    t.getTipoTerapia() != null ? t.getTipoTerapia().name() : null,
                     porcentajeTerapia,
                     citasPendientes
             );
         }).collect(Collectors.toList());
     }
+
+
+//    public List<Paciente> buscarNombreEnCita(String busqueda) {
+//        return pacienteRepository.buscarPacientes(busqueda);
+//    }
+
+    @Transactional
+    public List<CardPaciente> cardPacientes() {
+        List<Paciente> pacientes = pacienteRepository.findAll();
+
+        return pacientes.stream().map(p -> {
+            List<Terapia> terapias = p.getTerapia();
+            Date fechaHistorial = null;
+
+            if (terapias == null || terapias.isEmpty()) {
+                if (p.getHistorialClinico() != null) {
+                    fechaHistorial = p.getHistorialClinico().getFechaCreacion();
+                }
+
+                return new CardPaciente(
+                        p.getIdPaciente(),
+                        p.getNombre() + " " + p.getApellido(),
+                        p.getEmail(),
+                        p.getTelefono(),
+                        p.getEstado(),
+                        fechaHistorial,
+                        0,
+                        0,
+                        null,
+                        0.0,
+                        false
+                );
+            }
+
+            Terapia t = terapias.get(terapias.size() - 1);
+
+            int total = t.getNumeroSesiones();
+            long completada = t.getSesiones().stream()
+                    .filter(s -> s.getEstado() == Sesion.EstadoSesion.FINALIZADA)
+                    .count();
+
+            boolean citasPendientes = t.getSesiones().stream()
+                    .anyMatch(s -> s.getEstado() == Sesion.EstadoSesion.PENDIENTE
+                            || s.getEstado() == Sesion.EstadoSesion.CONFIRMADA);
+
+            Date fechaCreacionHistorial = null;
+            if (t.getHistorialClinico() != null) {
+                fechaCreacionHistorial = t.getHistorialClinico().getFechaCreacion();
+            }
+
+            double porcentajeTerapia = total == 0 ? 0 : (completada * 100.0) / total;
+
+            return new CardPaciente(
+                    p.getIdPaciente(),
+                    p.getNombre() + " " + p.getApellido(),
+                    p.getEmail(),
+                    p.getTelefono(),
+                    p.getEstado(),
+                    fechaCreacionHistorial,
+                    (int) completada,
+                    total,
+                    t.getTipoTerapia() != null ? t.getTipoTerapia().name() : null,
+                    porcentajeTerapia,
+                    citasPendientes
+            );
+        }).collect(Collectors.toList());
+    }
+
 
     @Transactional
     public Paciente actualizarPaciente(Long id,Paciente paciente) {
