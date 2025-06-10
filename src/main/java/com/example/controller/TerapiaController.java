@@ -46,11 +46,11 @@ public class TerapiaController {
     @PutMapping("/finalizar/{idTerapia}")
     public ResponseEntity<String> finalizarTerapia(@PathVariable Long idTerapia){
         terapiaService.finalizar(idTerapia);
-        return ResponseEntity.ok("Sesión cancelada con éxito");
+        return ResponseEntity.ok("Terapia finalizada con éxito");
     }
 
 
-    @DeleteMapping("/cancelar/{id}")
+    @DeleteMapping("/cancelar/{idTerapia}")
     public ResponseEntity<String> cancelarTerapia(@PathVariable Long idTerapia){
         terapiaService.cancelar(idTerapia);
         return ResponseEntity.ok("Terapia cancelada.");

@@ -61,17 +61,25 @@ public class Funcionario {
     private Date fechaCreacion;
 
 
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
-//    @JsonIgnore
-//    private List<Sesion> sesions;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
     @JsonIgnore
     private List<Terapia> terapia;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
     @JsonIgnore
+    private List<Sesion> sesiones;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "funcionario")
+    @JsonIgnore
     private List<NotaSesion> notaSesions;
+
+    public List<Sesion> getSesiones() {
+        return sesiones;
+    }
+
+    public void setSesiones(List<Sesion> sesiones) {
+        this.sesiones = sesiones;
+    }
 
     public List<Terapia> getTerapia() {
         return terapia;

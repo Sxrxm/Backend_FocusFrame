@@ -3,30 +3,24 @@ package com.example.controller;
 import com.example.dto.CardPaciente;
 import com.example.dto.FuncionarioPaso1Request;
 import com.example.dto.FuncionarioPaso1Response;
-import com.example.dto.PacienteResponse;
+import com.example.dto.SesionResponse;
 import com.example.model.Funcionario;
-import com.example.model.Paciente;
-import com.example.repository.FuncionarioRepository;
-import com.example.repository.PacienteRepository;
-import com.example.repository.SesionRepository;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
-import com.example.security.exception.BadRequestException;
-import com.example.security.exception.EntityNotFoundException;
-import com.example.security.jwt.JwtTokenManager;
 import com.example.service.FuncionarioService;
 import com.example.service.PacienteService;
+import com.example.service.SesionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -37,20 +31,15 @@ import java.util.*;
 public class FuncionarioController {
 
     private final FuncionarioService funcionarioService;
-    private final FuncionarioRepository funcionarioRepository;
-    private final JwtTokenManager jwtTokenManager;
-    private final PacienteRepository pacienteRepository;
     private final PacienteService pacienteService;
-    private final SesionRepository sesionRepository;
+    private final SesionService sesionService;
 
-    public FuncionarioController(FuncionarioService funcionarioService, FuncionarioRepository funcionarioRepository, JwtTokenManager jwtTokenManager, PacienteRepository pacienteRepository, PacienteService pacienteService, SesionRepository sesionRepository) {
+    public FuncionarioController(FuncionarioService funcionarioService, PacienteService pacienteService, SesionService sesionService) {
         this.funcionarioService = funcionarioService;
-        this.funcionarioRepository = funcionarioRepository;
-        this.jwtTokenManager = jwtTokenManager;
-        this.pacienteRepository = pacienteRepository;
         this.pacienteService = pacienteService;
-        this.sesionRepository = sesionRepository;
+        this.sesionService = sesionService;
     }
+
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener funcionario por ID", description = "Este endpoint permite obtener los detalles de un funcionario por su ID.")
@@ -134,29 +123,16 @@ public class FuncionarioController {
 
 
     @GetMapping("/pacientes")
-    public ResponseEntity<List<CardPaciente>> misPacientes() {
-        return ResponseEntity.ok(pacienteService.cardPacientes());
+    public ResponseEntity<Page<CardPaciente>> misPacientes(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("idPaciente").descending());
+        return ResponseEntity.ok(pacienteService.cardPacientes(pageable));
     }
 
 
-//    @GetMapping("/mis-pacientes")
-//    public ResponseEntity<List<CardPaciente>> obtenerMisPacientes() {
-//
-//        String email = SecurityContextHolder.getContext().getAuthentication();
-//        Funcionario psico = funcionarioRepository.findByUserEmail(email).orElseThrow(
-//                () -> new EntityNotFoundException("funcionario.not.found"));
-//
-//
-//        List<Paciente> registrado = pacienteRepository.findByFuncionario_IdFuncionario(psico.getIdFuncionario());
-//        List<Paciente> agendado = sesionRepository.findPacientesAgendadosConPsicologo(psico.getIdFuncionario());
-//
-//        Set<Paciente> todos = new HashSet<>();
-//        todos.addAll(registrado);
-//        todos.addAll(agendado);
-//
-//        return ResponseEntity.ok(todos.stream().map(mapper::toDTO).toList());
-//
-//
-//
-//    }
+    @GetMapping("/sesiones")
+    public ResponseEntity<List<SesionResponse>> obtenerSesiones(){
+        List<SesionResponse> sesiones = sesionService.obtenerSesionesPsicologo();
+        return ResponseEntity.ok(sesiones);
+    }
 }

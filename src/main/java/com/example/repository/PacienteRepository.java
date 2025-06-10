@@ -17,12 +17,13 @@ import java.util.Optional;
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     Paciente findByDocumento(int documento);
     Optional<Paciente> findByEmail(String email);
-    List<Paciente> findByFuncionario_IdFuncionario(long funcionarioId);
+    Page<Paciente> findAll(Pageable pageable);
+
 
     @Query("SELECT p FROM Paciente p WHERE " +
             "LOWER(p.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
             "LOWER(p.apellido) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
             "LOWER(p.email) LIKE LOWER(CONCAT('%', :busqueda, '%'))")
-    List<Paciente> buscarPacientes(@Param("busqueda") String busqueda);
+    Page<Paciente> buscarPacientes(@Param("busqueda") String busqueda, Pageable pageable);
 
 }

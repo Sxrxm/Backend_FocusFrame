@@ -12,6 +12,7 @@ public class CardPaciente {
     private Long telefono;
     private boolean estado;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Bogota")
+    private Long idHistorialClinico;
     private Date fechaCreacionHistorial;
     private int sesionesCompletadas;
     private int sesionesTotales;
@@ -20,12 +21,13 @@ public class CardPaciente {
     private boolean tieneCitasPendientes;
 
 
-    public CardPaciente(Long id, String nombrePaciente, String email, Long telefono, boolean estado, Date fechaCreacionHistorial, int sesionesCompletadas, int sesionesTotales, String nombreTerapia, double porcentajeTerapia, boolean tieneCitasPendientes) {
+    public CardPaciente(Long id, String nombrePaciente, String email, Long telefono, boolean estado, Long idHistorialClinico, Date fechaCreacionHistorial, int sesionesCompletadas, int sesionesTotales, String nombreTerapia, double porcentajeTerapia, boolean tieneCitasPendientes) {
         this.id = id;
         this.nombrePaciente = nombrePaciente;
         this.email = email;
         this.telefono = telefono;
         this.estado = estado;
+        this.idHistorialClinico = idHistorialClinico;
         this.fechaCreacionHistorial = fechaCreacionHistorial;
         this.sesionesCompletadas = sesionesCompletadas;
         this.sesionesTotales = sesionesTotales;
@@ -40,6 +42,14 @@ public class CardPaciente {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getIdHistorialClinico() {
+        return idHistorialClinico;
+    }
+
+    public void setIdHistorialClinico(Long idHistorialClinico) {
+        this.idHistorialClinico = idHistorialClinico;
     }
 
     public String getNombrePaciente() {

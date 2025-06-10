@@ -3,7 +3,9 @@ package com.example.controller;
 import com.example.dto.CardPaciente;
 import com.example.dto.CompletarPerfilPacienteRequest;
 import com.example.dto.RegistroPacienteRequest;
+import com.example.dto.SesionResponse;
 import com.example.model.Paciente;
+import com.example.model.Sesion;
 import com.example.model.User;
 import com.example.repository.PacienteRepository;
 import com.example.repository.UserRepository;
@@ -13,6 +15,7 @@ import com.example.security.jwt.JwtAuthenticationFilter;
 import com.example.security.service.UserService;
 import com.example.service.PacienteService;
 import com.example.service.RegistroPacienteService;
+import com.example.service.SesionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,9 @@ public class PacienteController {
 
     @Autowired
     private MessageSource messageSource;
+
+    @Autowired
+    private SesionService sesionService;
 
 
 
@@ -126,11 +132,16 @@ public class PacienteController {
 
 
     @GetMapping("/buscarPaciente")
-    public ResponseEntity<List<CardPaciente>> buscarCardPacientes(@RequestParam String busqueda) {
-        List<CardPaciente> resultado = pacienteService.buscarPaciente(busqueda);
+    public ResponseEntity<List<CardPaciente>> buscarCardPacientes(@RequestParam String busqueda, Pageable pageable) {
+        List<CardPaciente> resultado = pacienteService.buscarPaciente(busqueda, pageable);
         return ResponseEntity.ok(resultado);
     }
 
+    @GetMapping("/sesiones")
+    public ResponseEntity<List<SesionResponse>> obtenerSesiones(){
+        List<SesionResponse> sesiones = sesionService.obtenerSesionesPaciente();
+        return ResponseEntity.ok(sesiones);
+    }
 
     @PutMapping("/actualizarPaciente")
     public ResponseEntity<Paciente> actualizarPaciente(@PathVariable Long id,@RequestBody Paciente paciente, Locale locale) {

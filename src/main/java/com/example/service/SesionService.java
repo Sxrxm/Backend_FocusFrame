@@ -1,12 +1,10 @@
 package com.example.service;
 
+import com.example.dto.ResumenSesiones;
 import com.example.dto.SesionRequest;
 import com.example.dto.SesionResponse;
 import com.example.mapper.SesionMapper;
-import com.example.model.Funcionario;
-import com.example.model.Paciente;
-import com.example.model.Sesion;
-import com.example.model.Terapia;
+import com.example.model.*;
 import com.example.repository.FuncionarioRepository;
 import com.example.repository.PacienteRepository;
 import com.example.repository.SesionRepository;
@@ -16,7 +14,6 @@ import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +24,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -202,8 +198,33 @@ public class SesionService {
    }
 
 
-
    @Transactional
+   public List<SesionResponse> obtenerSesionesPaciente() {
+       String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+       Paciente paciente = pacienteRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
+       List<Sesion> sesiones = paciente.getSesions();
+       return sesiones.stream()
+               .map(sesionMapper::toResponse)
+               .toList();
+    }
+
+    @Transactional
+    public List<SesionResponse> obtenerSesionesPsicologo() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+
+        List<Sesion> sesiones = funcionario.getSesiones();
+        return sesiones.stream()
+                .map(sesionMapper::toResponse)
+                .toList();
+    }
+
+
+    @Transactional
     public Sesion reagendarSesion(Long id, Sesion sesionDetails) {
         return sesionRepository.findById(id).map(sesion -> {
             sesion.setFechaSesion(sesionDetails.getFechaSesion());
@@ -234,7 +255,11 @@ public class SesionService {
         sesion.setEstado(Sesion.EstadoSesion.CANCELADA);
     }
 
-    public List<Sesion> getSesionesByEstado(String estado) {
-        return sesionRepository.findByEstado(estado);
-    }
+    public List<ResumenSesiones> getSesionesByEstado()  { String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+            .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+
+    return sesionRepository.resumenSesiones(funcionario);
+}
 }

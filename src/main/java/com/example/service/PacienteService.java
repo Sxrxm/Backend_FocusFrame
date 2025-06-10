@@ -25,19 +25,17 @@ public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
     private final UserRepository userRepository;
-    private final TerapiaRepository terapiaRepository;
 
     @Autowired
-    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository, TerapiaRepository terapiaRepository) {
+    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository) {
         this.pacienteRepository = pacienteRepository;
         this.userRepository = userRepository;
-        this.terapiaRepository = terapiaRepository;
     }
 
 
-    public List<CardPaciente> buscarPaciente(String busqueda) {
+    public List<CardPaciente> buscarPaciente(String busqueda, Pageable pageable) {
 
-        List<Paciente> pacientes = pacienteRepository.buscarPacientes(busqueda);
+        Page<Paciente> pacientes = pacienteRepository.buscarPacientes(busqueda, pageable);
 
         return pacientes.stream().map(p -> {
             List<Terapia> terapias = p.getTerapia();
@@ -47,6 +45,8 @@ public class PacienteService {
                 if (p.getHistorialClinico() != null) {
                     fechaHistorial = p.getHistorialClinico().getFechaCreacion();
                 }
+                HistorialClinico historialClinico = p.getHistorialClinico();
+
 
                 return new CardPaciente(
                         p.getIdPaciente(),
@@ -54,6 +54,7 @@ public class PacienteService {
                         p.getEmail(),
                         p.getTelefono(),
                         p.getEstado(),
+                        historialClinico.getId(),
                         fechaHistorial,
                         0,
                         0,
@@ -79,6 +80,8 @@ public class PacienteService {
                 fechaCreacionHistorial = t.getHistorialClinico().getFechaCreacion();
             }
 
+            HistorialClinico historialClinico = p.getHistorialClinico();
+
             double porcentajeTerapia = total == 0 ? 0 : (completada * 100.0) / total;
 
             return new CardPaciente(
@@ -87,6 +90,7 @@ public class PacienteService {
                     p.getEmail(),
                     p.getTelefono(),
                     p.getEstado(),
+                    historialClinico.getId(),
                     fechaCreacionHistorial,
                     (int) completada,
                     total,
@@ -98,29 +102,24 @@ public class PacienteService {
     }
 
 
-//    public List<Paciente> buscarNombreEnCita(String busqueda) {
-//        return pacienteRepository.buscarPacientes(busqueda);
-//    }
 
     @Transactional
-    public List<CardPaciente> cardPacientes() {
-        List<Paciente> pacientes = pacienteRepository.findAll();
+    public Page<CardPaciente> cardPacientes(Pageable pageable) {
+        Page<Paciente> pacientes = pacienteRepository.findAll(pageable);
 
-        return pacientes.stream().map(p -> {
+        Page<CardPaciente> resultado = pacientes.map(p -> {
             List<Terapia> terapias = p.getTerapia();
-            Date fechaHistorial = null;
+            HistorialClinico historialClinico = p.getHistorialClinico();
+            Date fechaHistorial = historialClinico != null ? historialClinico.getFechaCreacion() : null;
 
             if (terapias == null || terapias.isEmpty()) {
-                if (p.getHistorialClinico() != null) {
-                    fechaHistorial = p.getHistorialClinico().getFechaCreacion();
-                }
-
                 return new CardPaciente(
                         p.getIdPaciente(),
                         p.getNombre() + " " + p.getApellido(),
                         p.getEmail(),
                         p.getTelefono(),
                         p.getEstado(),
+                        historialClinico != null ? historialClinico.getId() : null,
                         fechaHistorial,
                         0,
                         0,
@@ -141,10 +140,7 @@ public class PacienteService {
                     .anyMatch(s -> s.getEstado() == Sesion.EstadoSesion.PENDIENTE
                             || s.getEstado() == Sesion.EstadoSesion.CONFIRMADA);
 
-            Date fechaCreacionHistorial = null;
-            if (t.getHistorialClinico() != null) {
-                fechaCreacionHistorial = t.getHistorialClinico().getFechaCreacion();
-            }
+            Date fechaCreacionHistorial = t.getHistorialClinico() != null ? t.getHistorialClinico().getFechaCreacion() : null;
 
             double porcentajeTerapia = total == 0 ? 0 : (completada * 100.0) / total;
 
@@ -154,6 +150,7 @@ public class PacienteService {
                     p.getEmail(),
                     p.getTelefono(),
                     p.getEstado(),
+                    historialClinico != null ? historialClinico.getId() : null,
                     fechaCreacionHistorial,
                     (int) completada,
                     total,
@@ -161,7 +158,9 @@ public class PacienteService {
                     porcentajeTerapia,
                     citasPendientes
             );
-        }).collect(Collectors.toList());
+        });
+
+        return resultado;
     }
 
 

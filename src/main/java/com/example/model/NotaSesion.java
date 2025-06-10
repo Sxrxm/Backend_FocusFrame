@@ -36,12 +36,52 @@ public class NotaSesion {
 
 
     @Column(nullable = false, name = "categoria_nota")
-    private categoriaNota categoria;
+    private CategoriaNota categoria;
 
 
-    private enum categoriaNota{
-        importante,
-        proceso,
-        altoPeligro
+    public enum CategoriaNota {
+        GENERAL,
+        DIAGNOSTICO,
+        TRATAMIENTO
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getContenido() {
+        return contenido;
+    }
+
+    public void setContenido(String contenido) {
+        this.contenido = contenido;
+    }
+
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public void setFuncionario(Funcionario funcionario) {
+        this.funcionario = funcionario;
+    }
+
+    public CategoriaNota getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaNota categoria) {
+        this.categoria = categoria;
     }
 }
