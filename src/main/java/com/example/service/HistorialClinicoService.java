@@ -4,6 +4,7 @@ import com.example.dto.HistorialClinicoDto;
 import com.example.dto.HistorialClinicoResponse;
 import com.example.model.*;
 import com.example.repository.ContactoEmergenciaRepository;
+import com.example.repository.FuncionarioRepository;
 import com.example.repository.HistorialClinicoRepository;
 import com.example.repository.PacienteRepository;
 import com.example.security.exception.BadRequestException;
@@ -11,9 +12,11 @@ import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,16 +30,16 @@ public class HistorialClinicoService {
     private final PacienteRepository pacienteRepository;
     private final ContactoEmergenciaRepository contactoEmergenciaRepository;
     private final ContactoEmergenciaService contactoEmergenciaService;
-    private final MessageSource messageSource;
+    private final FuncionarioRepository funcionarioRepository;
 
 
     @Autowired
-    public HistorialClinicoService(HistorialClinicoRepository historialClinicoRepository, PacienteRepository pacienteRepository, ContactoEmergenciaRepository contactoEmergenciaRepository, ContactoEmergenciaService contactoEmergenciaService, MessageSource messageSource) {
+    public HistorialClinicoService(HistorialClinicoRepository historialClinicoRepository, PacienteRepository pacienteRepository, ContactoEmergenciaRepository contactoEmergenciaRepository, ContactoEmergenciaService contactoEmergenciaService, FuncionarioRepository funcionarioRepository) {
         this.historialClinicoRepository = historialClinicoRepository;
         this.pacienteRepository = pacienteRepository;
         this.contactoEmergenciaRepository = contactoEmergenciaRepository;
         this.contactoEmergenciaService = contactoEmergenciaService;
-        this.messageSource = messageSource;
+        this.funcionarioRepository = funcionarioRepository;
     }
 
 
@@ -92,8 +95,16 @@ public class HistorialClinicoService {
 
     @Transactional
     public HistorialClinicoResponse getHistorialClinico(Long pacienteId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+
         Paciente paciente = pacienteRepository.findById(pacienteId)
                 .orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+
+        if (!paciente.getFuncionario().getIdFuncionario().equals(funcionario.getIdFuncionario())) {
+            throw new BadRequestException("historial.permiso");
+        }
 
         HistorialClinico historialClinico = historialClinicoRepository.findByPacienteIdPaciente(paciente.getIdPaciente())
                 .orElseThrow(() -> new EntityNotFoundException("medical.history.not.found"));

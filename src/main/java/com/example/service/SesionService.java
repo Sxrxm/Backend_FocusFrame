@@ -132,6 +132,7 @@ public class SesionService {
         sesion.setFuncionario(funcionario);
         sesion.setPaciente(paciente);
         sesion.setTerapia(terapia);
+        sesion.setHistorialClinico(terapia.getHistorialClinico());
         sesion.setNotasAdicionales(sesionRequest.getNotasAdicionales());
         sesion.setEstado(Sesion.EstadoSesion.PENDIENTE);
 

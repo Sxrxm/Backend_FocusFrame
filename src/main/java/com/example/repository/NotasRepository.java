@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface NotasRepository extends JpaRepository<NotaSesion, Long> {
-    List<NotaSesion> findByFuncionarioAndCategoria(Funcionario funcionario, NotaSesion.CategoriaNota categoriaNota);
+    List<NotaSesion> findByFuncionarioAndCategoriaNota(Funcionario funcionario, NotaSesion.CategoriaNota categoriaNota);
+
+    List<NotaSesion> findByFuncionario(Funcionario funcionario);
 
 }

@@ -44,15 +44,32 @@ public class NotaSesionService {
     }
 
     @Transactional
-    public ResponseEntity<List<NotaSesion>> obtenerNotas(NotaSesion.CategoriaNota categoria){
+    public ResponseEntity<List<NotaSesion>> obtenerNotasPorCategoria(NotaSesion.CategoriaNota categoria){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
-        List<NotaSesion> notas = notasRepository.findByFuncionarioAndCategoria(funcionario, categoria);
+
+
+        List<NotaSesion> notas = notasRepository.findByFuncionarioAndCategoriaNota(funcionario, categoria);
+        if (notas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(notas);
     }
 
+    @Transactional
+    public ResponseEntity<List<NotaSesion>> obtenerNotasPorPsicologo(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+
+        List<NotaSesion> notas = notasRepository.findByFuncionario(funcionario);
+        return ResponseEntity.ok(notas);
+    }
+
+
+    @Transactional
     public ResponseEntity<NotaSesion> obtenerNotaPorId(Long id) {
         NotaSesion nota = notasRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("nota.not.found"));
@@ -67,13 +84,13 @@ public class NotaSesionService {
         notasRepository.delete(nota);
     }
 
-    public ResponseEntity<NotaSesion> actualizarNota(@PathVariable Long id, @RequestBody NotaSesion nuevaNota) {
+    @Transactional
+    public ResponseEntity<NotaSesion> actualizarNota(Long id, NotaSesion nuevaNota) {
         NotaSesion nota = notasRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("nota.not.found"));
 
-        nota.setContenido(nuevaNota.getContenido());
-        nota.setCategoria(nuevaNota.getCategoria());
-        nota.setFechaCreacion(nuevaNota.getFechaCreacion());
+        nota.setCategoriaNota(nuevaNota.getCategoriaNota());
+        nota.setFechaActualizacion(new Date());
 
         NotaSesion actualizada = notasRepository.save(nota);
         return ResponseEntity.ok(actualizada);

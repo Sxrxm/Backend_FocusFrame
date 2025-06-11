@@ -37,7 +37,7 @@ public class Terapia {
     @JsonIgnore
     private Set<Sesion> sesiones;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idHistorialClinico")
     @JsonIgnore
     private HistorialClinico historialClinico;
