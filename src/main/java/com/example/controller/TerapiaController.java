@@ -36,9 +36,9 @@ public class TerapiaController {
         return ResponseEntity.ok(terapias);
     }
 
-    @PostMapping("/crear")
-    public ResponseEntity<?> crearTerapia(@RequestBody TerapiaRequest request) {
-        Terapia terapia = terapiaService.crear(request);
+    @PostMapping("/crear/{idPaciente}")
+    public ResponseEntity<?> crearTerapia(@PathVariable Long idPaciente, @RequestBody TerapiaRequest request) {
+        Terapia terapia = terapiaService.crear(idPaciente, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(terapia);
     }
 

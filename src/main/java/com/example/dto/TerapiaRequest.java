@@ -12,7 +12,6 @@ public class TerapiaRequest {
     private String descripcion;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private Long idPaciente;
     private Set<Sesion> sesiones;
     private int numeroSesiones;
 
@@ -52,13 +51,6 @@ public class TerapiaRequest {
     }
 
 
-    public Long getIdPaciente() {
-        return idPaciente;
-    }
-
-    public void setIdPaciente(Long idPaciente) {
-        this.idPaciente = idPaciente;
-    }
 
     public int getNumeroSesiones() {
         return numeroSesiones;

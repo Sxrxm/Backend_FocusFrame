@@ -47,14 +47,14 @@ public class TerapiaService {
 
 
     @Transactional
-   public Terapia  crear (TerapiaRequest request) {
+   public Terapia  crear ( Long idPaciente, TerapiaRequest request) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found : "));
 
-        Paciente paciente = pacienteRepository.findById(request.getIdPaciente())
+        Paciente paciente = pacienteRepository.findById(idPaciente)
                  .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
 
