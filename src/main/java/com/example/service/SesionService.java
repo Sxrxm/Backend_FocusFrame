@@ -48,7 +48,7 @@ public class SesionService {
         this.emailService = emailService;
     }
 
-    @Value("${app.horario.inicio:9}")
+    @Value("${app.horario.inicio:8}")
     private int horaInicioTrabajo;
 
     @Value("${app.horario.fin:18}")
@@ -256,11 +256,13 @@ public class SesionService {
         sesion.setEstado(Sesion.EstadoSesion.CANCELADA);
     }
 
-    public List<ResumenSesiones> getSesionesByEstado()  { String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    public List<ResumenSesiones> getSesionesByEstado()  {
 
-    Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
-            .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-    return sesionRepository.resumenSesiones(funcionario);
-}
+        Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+
+        return sesionRepository.resumenSesiones(funcionario);
+    }
 }

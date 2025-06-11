@@ -2,16 +2,18 @@ package com.example.service;
 
 
 import com.example.dto.CardPaciente;
+import com.example.dto.SesionResponse;
+import com.example.mapper.SesionMapper;
 import com.example.model.*;
+import com.example.repository.FuncionarioRepository;
 import com.example.repository.PacienteRepository;
-import com.example.repository.TerapiaRepository;
 import com.example.repository.UserRepository;
 import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -25,17 +27,26 @@ public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
     private final UserRepository userRepository;
+    private final SesionMapper sesionMapper;
+    private final FuncionarioRepository funcionarioRepository;
+
 
     @Autowired
-    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository) {
+    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository, SesionMapper sesionMapper, FuncionarioRepository funcionarioRepository) {
         this.pacienteRepository = pacienteRepository;
         this.userRepository = userRepository;
+        this.sesionMapper = sesionMapper;
+        this.funcionarioRepository = funcionarioRepository;
     }
 
 
     public List<CardPaciente> buscarPaciente(String busqueda, Pageable pageable) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Page<Paciente> pacientes = pacienteRepository.buscarPacientes(busqueda, pageable);
+        Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+        Page<Paciente> pacientes = pacienteRepository.buscarPacientes(busqueda,funcionario, pageable);
+
 
         return pacientes.stream().map(p -> {
             List<Terapia> terapias = p.getTerapia();
@@ -105,7 +116,11 @@ public class PacienteService {
 
     @Transactional
     public Page<CardPaciente> cardPacientes(Pageable pageable) {
-        Page<Paciente> pacientes = pacienteRepository.findAll(pageable);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
+        Page<Paciente> pacientes = pacienteRepository.findAllByFuncionario(funcionario,pageable);
 
         Page<CardPaciente> resultado = pacientes.map(p -> {
             List<Terapia> terapias = p.getTerapia();
@@ -164,15 +179,15 @@ public class PacienteService {
     }
 
 
-    @Transactional
-    public Paciente actualizarPaciente(Long id,Paciente paciente) {
-        if (pacienteRepository.existsById(id)) {
-            paciente.setIdPaciente(id);
-            return pacienteRepository.save(paciente);
-        }else {
-            throw new EntityNotFoundException("patient.not.found");
-        }
-    }
+//    @Transactional
+//    public Paciente actualizarPaciente(Long id,Paciente paciente) {
+//        if (pacienteRepository.existsById(id)) {
+//            paciente.setIdPaciente(id);
+//            return pacienteRepository.save(paciente);
+//        }else {
+//            throw new EntityNotFoundException("patient.not.found");
+//        }
+//    }
 
     @Transactional
     public Paciente desactivarPaciente(Long pacienteId) {
@@ -201,10 +216,15 @@ public class PacienteService {
     }
 
     @Transactional
-    public List<Sesion> obtenerSesionesDePaciente(Long pacienteId) {
-        Paciente paciente = pacienteRepository.findById(pacienteId)
+    public List<SesionResponse> obtenerSesionesPaciente() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Paciente paciente = pacienteRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
 
-        return paciente.getSesions();
+        List<Sesion> sesiones = paciente.getSesions();
+        return sesiones.stream()
+                .map(sesionMapper::toResponse)
+                .toList();
     }
 }

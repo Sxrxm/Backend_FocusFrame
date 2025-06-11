@@ -12,12 +12,10 @@ import com.example.security.exception.BadRequestException;
 import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Locale;
 
 @Service
 public class RegistroPacienteService {
@@ -85,6 +83,7 @@ public class RegistroPacienteService {
         paciente.setApellido(request.getApellido());
         paciente.setFechaCreacion(new Date());
         paciente.setUserRole(usuario.getUserRole());
+        paciente.setUser(usuario);
         paciente.setEstado(false);
         paciente.setPerfilCompletado(false);
         paciente.setFuncionario(funcionario);

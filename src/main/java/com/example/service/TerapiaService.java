@@ -9,8 +9,6 @@ import com.example.repository.TerapiaRepository;
 import com.example.security.exception.BadRequestException;
 import com.example.security.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +17,6 @@ import java.util.Set;
 @Service
 public class TerapiaService {
 
-    @Autowired
-    private MessageSource messageSource;
 
     private final TerapiaRepository terapiaRepository;
     private final FuncionarioRepository funcionarioRepository;

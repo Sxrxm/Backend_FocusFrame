@@ -56,10 +56,6 @@ public class FuncionarioService {
     }
 
 
-    @Transactional
-    public List<Funcionario> getAllFuncionario (){
-        return funcionarioRepository.findAll();
-    }
 
 
     @Transactional
@@ -130,8 +126,11 @@ public class FuncionarioService {
         Funcionario funcionarioExistente = funcionarioRepository.findByUserId(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
-        funcionarioMapper.updateFuncionarioPaso3(funcionarioExistente, datosNuevos);
 
+        funcionarioExistente.setEspecialidad(datosNuevos.getEspecialidad());
+        funcionarioExistente.setExperiencia(datosNuevos.getExperiencia());
+        funcionarioExistente.setLicencia(datosNuevos.getLicencia());
+        funcionarioExistente.setEstado(true);
 
         return funcionarioRepository.save(funcionarioExistente);
     }

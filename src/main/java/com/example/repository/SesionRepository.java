@@ -17,8 +17,6 @@ import java.util.List;
 @Repository
 public interface SesionRepository extends JpaRepository<Sesion, Long> {
 
-    List<Sesion> findByEstado(String estado);
-
     List<Sesion> findByFuncionarioAndFechaSesion(Funcionario funcionario,LocalDate fechaSesion);
 
     List<Sesion> findByFuncionarioIdFuncionarioAndFechaSesion(Long idFuncionario, LocalDate fecha);
