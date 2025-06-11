@@ -228,11 +228,10 @@ public class SesionService {
     @Transactional
     public List<SesionResponse> obtenerSesionesPsicologo() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         Funcionario funcionario = funcionarioRepository.findByUserEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("funcionario.not.found"));
 
-        List<Sesion> sesiones = funcionario.getSesiones();
+        List<Sesion> sesiones = sesionRepository.findByFuncionarioOrderByFechaSesionDescHoraInicioDesc(funcionario);
         return sesiones.stream()
                 .map(sesionMapper::toResponse)
                 .toList();
