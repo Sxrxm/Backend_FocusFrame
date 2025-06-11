@@ -200,10 +200,10 @@ public class SesionService {
 
 
    @Transactional
-   public List<SesionResponse> obtenerSesionesPaciente() {
+   public List<SesionResponse> obtenerSesionesPaciente(Long idPaciente) {
        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-       Paciente paciente = pacienteRepository.findByEmail(email)
+       Paciente paciente = pacienteRepository.findById(idPaciente)
                 .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
        List<Sesion> sesiones = paciente.getSesions();
        return sesiones.stream()

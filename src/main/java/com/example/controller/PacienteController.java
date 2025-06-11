@@ -135,9 +135,9 @@ public class PacienteController {
         return ResponseEntity.ok(resultado);
     }
 
-    @GetMapping("/sesiones")
-    public ResponseEntity<List<SesionResponse>> obtenerSesiones(){
-        List<SesionResponse> sesiones = sesionService.obtenerSesionesPaciente();
+    @GetMapping("/sesiones/{idPaciente}")
+    public ResponseEntity<List<SesionResponse>> obtenerSesiones(@PathVariable Long idPaciente){
+        List<SesionResponse> sesiones = sesionService.obtenerSesionesPaciente(idPaciente);
         return ResponseEntity.ok(sesiones);
     }
 
