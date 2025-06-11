@@ -143,7 +143,7 @@ public class PacienteController {
 
     @GetMapping("/sesiones")
     public ResponseEntity<List<SesionResponse>> obtenerSesiones(){
-        List<SesionResponse> sesiones = sesionService.sesionesPacienteAtenticado();
+        List<SesionResponse> sesiones = sesionService.sesionesPacienteAutenticado();
         return ResponseEntity.ok(sesiones);
     }
 

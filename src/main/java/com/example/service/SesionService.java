@@ -211,16 +211,18 @@ public class SesionService {
     }
 
     @Transactional
-    public List<SesionResponse> sesionesPacienteAtenticado() {
-
+    public List<SesionResponse> sesionesPacienteAutenticado() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Paciente paciente = pacienteRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
-        List<Sesion> sesiones = paciente.getSesions();
+
+        List<Sesion> sesiones = sesionRepository.findByPacienteOrderByFechaSesionDescHoraInicioDesc(paciente);
+
         return sesiones.stream()
                 .map(sesionMapper::toResponse)
                 .toList();
     }
+
 
 
     @Transactional

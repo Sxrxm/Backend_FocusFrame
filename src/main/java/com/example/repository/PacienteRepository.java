@@ -3,6 +3,7 @@ package com.example.repository;
 import com.example.dto.CardPaciente;
 import com.example.model.Funcionario;
 import com.example.model.Paciente;
+import com.example.model.Sesion;
 import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
