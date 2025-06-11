@@ -75,8 +75,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/paciente/completar-perfil/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/cambioContra").authenticated()
                         .requestMatchers(HttpMethod.POST,"/funcionario/paso1", "/funcionario/paso2/**", "/funcionario/paso3/**").permitAll()
+                        .requestMatchers(HttpMethod.GET ,"/paciente/sesiones").hasAnyAuthority("PACIENTE")
+                        .requestMatchers("/paciente/sesiones/**").hasAnyAuthority("PSICOLOGO","PACIENTE")
                         .requestMatchers("/paciente/**").hasAuthority("PSICOLOGO")
-                        .requestMatchers("/paciente/sesiones").hasAnyAuthority("PACIENTE")
                         .requestMatchers("/funcionario/**", "/notas/**").hasAuthority("PSICOLOGO")
                         .requestMatchers(HttpMethod.GET, "/historialClinico/consultarHistorial/{pacienteId}").hasAnyAuthority("PSICOLOGO", "PACIENTE")
                         .requestMatchers(HttpMethod.POST,"/historialClinico/crearHistorial/{idPaciente}").hasAuthority("PSICOLOGO")
@@ -117,6 +118,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-Requested-With", "Accept"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -124,4 +126,5 @@ public class SecurityConfig implements WebMvcConfigurer {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }

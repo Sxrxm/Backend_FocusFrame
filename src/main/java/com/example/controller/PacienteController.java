@@ -141,6 +141,14 @@ public class PacienteController {
         return ResponseEntity.ok(sesiones);
     }
 
+    @GetMapping("/sesiones")
+    public ResponseEntity<List<SesionResponse>> obtenerSesiones(){
+        List<SesionResponse> sesiones = sesionService.sesionesPacienteAtenticado();
+        return ResponseEntity.ok(sesiones);
+    }
+
+
+
 
     @PutMapping("/actualizarPaciente")
     public ResponseEntity<Paciente> actualizarPaciente(@PathVariable Long id,@RequestBody Paciente paciente, Locale locale) {

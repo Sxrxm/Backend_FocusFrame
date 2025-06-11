@@ -201,7 +201,6 @@ public class SesionService {
 
    @Transactional
    public List<SesionResponse> obtenerSesionesPaciente(Long idPaciente) {
-       String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
        Paciente paciente = pacienteRepository.findById(idPaciente)
                 .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
@@ -210,6 +209,19 @@ public class SesionService {
                .map(sesionMapper::toResponse)
                .toList();
     }
+
+    @Transactional
+    public List<SesionResponse> sesionesPacienteAtenticado() {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Paciente paciente = pacienteRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("patient.not.found"));
+        List<Sesion> sesiones = paciente.getSesions();
+        return sesiones.stream()
+                .map(sesionMapper::toResponse)
+                .toList();
+    }
+
 
     @Transactional
     public List<SesionResponse> obtenerSesionesPsicologo() {
