@@ -3,7 +3,7 @@ package com.example.controller;
 import com.example.dto.CardPaciente;
 import com.example.dto.FuncionarioPaso1Request;
 import com.example.dto.FuncionarioPaso1Response;
-import com.example.dto.SesionResponse;
+import com.example.dto.SesionResponse ;
 import com.example.model.Funcionario;
 import com.example.security.dto.RegistrationRequest;
 import com.example.security.dto.RegistrationResponse;
